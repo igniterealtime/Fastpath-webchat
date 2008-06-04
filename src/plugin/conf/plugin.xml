@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  Plugin configuration for the Spark Fastpath web client plugin.
+  Plugin configuration for the Fastpath web client plugin.
 -->
 <plugin>
     <class>org.jivesoftware.liveassistant.WebClientPlugin</class>
-    <name>Spark Fastpath Webchat</name>
-    <description>Web based chat client for Spark Fastpath.</description>
+    <name>Fastpath Webchat</name>
+    <description>Web based chat client for Fastpath.</description>
     <author>Jive Software</author>
     <version>3.5.2</version>
     <date>6/4/2008</date>
