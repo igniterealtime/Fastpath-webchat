@@ -1,0 +1,165 @@
+/*
+ $RCSfile$
+ $Revision: 18603 $
+ $Date: 2005-03-14 18:28:28 -0800 (Mon, 14 Mar 2005) $
+
+ Copyright Jive Software, all rights reserved.
+*/
+
+BODY, TH, TD, DIV, P, UL, LI {
+    font-size : 10pt;
+    font-family : arial, helvetica, sans-serif;
+}
+BODY {
+    background-color : #fff;
+}
+#img-logo {
+    padding-right : 1em;
+}
+#download {
+    list-style-image : url(../images/win.gif);
+}
+#changelog {
+    list-style-image : url(../images/txt.gif);
+}
+#plugin {
+    list-style-image : url(../images/plugin.gif);
+}
+#links LI {
+    padding : 0 0 1em 0;
+    margin : 0;
+}
+#email {
+    padding : 1em;
+    border : 1px #ccc solid;
+}
+#email P {
+    font-family : courier new, monospace !important;
+}
+P {
+    padding-top : 0px;
+    padding-bottom : 0.5em;
+    margin-top : 0px;
+    margin-bottom : 0.5em;
+}
+UL {
+    padding-top : 0px;
+    margin-top : 0px; 
+}
+.main {
+    width : 600px;
+}
+.left-gutter {
+    text-align : right;
+}
+.main-img {
+    border-bottom : 1px #C5D2E3 dashed;
+    padding-top : 38px;
+}
+.nav-links {
+    border-bottom : 1px #C5D2E3 dashed;
+    padding : 3px;
+    font-size : 8pt;
+    font-family : verdana, arial, helvetica, sans-serif;
+}
+.nav-links A {
+    text-decoration : none;
+    font-weight : bold;
+    padding-right : 2em;
+}
+H4 {
+    font-size : 12pt;
+    font-weight : bold;
+}
+A {
+    color : #11568C;
+}
+A:visited {
+
+}
+A:hover {
+    color : #7A1D42;
+}
+.footer {
+    margin-top : 50px;
+    margin-bottom : 15px;
+    border-top : 1px #C5D2E3 solid;
+    padding : 2px;
+    text-align : center;
+    font-size : 8pt;
+    font-family : verdana,arial,helvetica,sans-serif;
+    color : #7498C0;
+}
+.footer A, .footer A:visited, .footer A:hover {
+    color : #7498C0;
+}
+.pageheader {
+    font-size : 12pt;
+    font-weight : bold;
+}
+
+.project {
+    border : 2px #C5D2E3 solid;
+}
+.project TH, .project TD {
+    padding : 3px;
+}
+.project TH {
+    text-align : left;
+    font-size : 8pt;
+    font-weight : bold;
+    font-family : verdana, arial, helvetica, sans-serif;
+    background-color : #DCE8F7;
+}
+.project .subheader TH {
+    padding-top : 6px;
+    border-bottom : 1px #C5D2E3 solid;
+}
+.project .category {
+    border-bottom : 1px #C5D2E3 dashed;
+}
+.project .category {
+    padding-top : 10px;
+}
+.project .title {
+    font-size : 12pt;
+    font-family : arial, helvetica, sans-serif;
+}
+.project .icon {
+    width : 1%;
+    text-align : center;
+    padding-left : 6px;
+    padding-right : 6px;
+}
+.project .even TD {
+    background-color : #EFF5FD;
+}
+.project .size {
+    text-align : right;
+    padding-right : 1em;
+}
+
+.issues-box .sidebar-box TD {
+    font-size : 8pt;
+    font-family : verdana, arial, helvetica, sans-serif;
+}
+
+.sidebar {
+    padding-left : 10px;
+}
+.sidebar-box {
+    border : 1px #C5D2E3 solid;
+    margin-bottom : 2em;
+}
+.sidebar-box TH, .sidebar-box TD {
+    padding : 3px;
+}
+.sidebar-box TH {
+    background-color : #DCE8F7;
+    border-bottom : 1px #C5D2E3 solid;
+}
+.sidebar-box THEAD TH {
+    font-size : 8pt;
+    font-family : verdana,arial,helvetica,sans-serif;
+}
+

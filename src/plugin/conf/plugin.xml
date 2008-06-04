@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Plugin configuration for the Spark Fastpath web client plugin.
+-->
+<plugin>
+    <class>org.jivesoftware.liveassistant.WebClientPlugin</class>
+    <name>Spark Fastpath Webchat</name>
+    <description>Web based chat client for Spark Fastpath.</description>
+    <author>Jive Software</author>
+    <version>3.5.2</version>
+    <date>6/12/2008</date>
+    <minServerVersion>3.5.0</minServerVersion>
+    <adminconsole>
+
+        <tab id="workgroup-tab">
+            <sidebar id="workgroup-sidebar"/>
+            <sidebar id="agentgroup-sidebar"/>
+            <sidebar id="reporting-sidebar"/>
+            <sidebar id="tools" name="Tools">
+                <item id="webchat-page" name="Webchat"
+                      url="../../webchat"
+                      description="Click to start a webchat session.">
+                </item>
+            </sidebar>
+        </tab>
+    </adminconsole>
+</plugin>

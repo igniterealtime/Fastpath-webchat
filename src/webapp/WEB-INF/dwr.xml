@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 1.0//EN" "http://www.getahead.ltd.uk/dwr//dwr10.dtd">
+<dwr>
+    <allow>
+        <create creator="new" javascript="TheDate">
+            <param name="class" value="java.util.Date"/>
+        </create>
+        <create creator="new" javascript="chat">
+            <param name="class" value="org.jivesoftware.webchat.personal.PersonalChat"/>
+        </create>
+        <create creator="new" javascript="room">
+            <param name="class" value="org.jivesoftware.webchat.ChatUtils"/>
+        </create>
+        <convert converter="bean" match="org.jivesoftware.webchat.personal.ChatMessage"/>
+        <convert converter="bean" match="org.jivesoftware.webchat.actions.ChatQueue"/>
+    </allow>
+</dwr>

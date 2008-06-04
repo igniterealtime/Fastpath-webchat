@@ -1,0 +1,19 @@
+<configuration>
+    <context>/</context>
+    <port>8081</port>
+    <libs>
+        <dir>../../../../tools/launcher/lib/dev</dir>
+        <dir>../src/webapp/WEB-INF/lib</dir>
+        <dir>lib</dir>
+        <dir>lib/merge</dir>
+    </libs>
+    <classDirs>
+        <dir>../target/classes/core</dir>
+    </classDirs>
+    <webDirs>
+        <webDir>
+            <path>/</path>
+            <dir>../src/webapp</dir>
+        </webDir>
+    </webDirs>
+</configuration>

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Web Client" default="plugin" basedir="..">
+
+    <description>
+        Build script for the Fastpath web chat client.
+    </description>
+
+    <!-- ======================================================================================= -->
+    <!-- GLOBAL TASKDEFs                                                                         -->
+    <!-- ======================================================================================= -->
+
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+        <classpath><pathelement location="${basedir}/build/lib/ant-contrib.jar"/></classpath>
+    </taskdef>
+
+    <!-- ======================================================================================= -->
+    <!-- PROPERTIES                                                                              -->
+    <!-- ======================================================================================= -->
+    <property file="${basedir}/build/build.properties" />
+    <property name="overwrite" value="false" />
+    <property name="src.dir" value="${basedir}/src" />
+    <property name="src.core.dir" value="${src.dir}/java" />
+    <property name="src.plugin.dir" value="${src.dir}/plugin" />
+    <property name="src.webapp.dir" value="${src.dir}/webapp" />
+    <property name="target.dir" value="${basedir}/target" />
+    <property name="target.war.dir" value="${target.dir}" />
+    <property name="target.plugin.dir" value="${target.dir}/plugin" />
+    <property name="compile.dir" value="${basedir}/target/classes" />
+    <property name="compile.core.dir" value="${compile.dir}/core" />
+    <property name="compile.plugin.dir" value="${compile.dir}/plugin" />
+    <property name="compile.web.dir" value="${compile.dir}/web" />
+    <property name="jspc.dest.dir" value="${compile.dir}/jspc" />
+    <property name="jspc.java.dest.dir" value="${compile.dir}/jspc/java" />
+    <property name="jspc.classes.dest.dir" value="${compile.dir}/jspc/classes" />
+    <property name="jar.core.name" value="webclient.jar" />
+    <property name="jar.plugin.name" value="plugin-webclient.jar" />
+    <property name="war.plugin.name" value="webchat.war" />
+    <property name="war.core.name" value="webchat.war" />
+    <property name="lib.build.dir" value="${basedir}/build/lib" />
+    <property name="lib.merge.dir" value="${basedir}/build/lib/merge" />
+    <property name="lib.web.dir" value="${src.webapp.dir}/WEB-INF/lib" />
+    <property name="openfire.home" value="${basedir}/../openfire" />
+    <property name="deploy.dir" value="${target.dir}/deploy" />
+
+    <!-- ======================================================================================= -->
+    <!-- PATHs / PATTERNSETs / FILTERSETs                                                        -->
+    <!-- ======================================================================================= -->
+
+    <patternset id="compile.sources">
+        <include name="**/*.java" />
+    </patternset>
+
+    <path id="compile.dependencies">
+        <fileset dir="${lib.build.dir}" includes="*.jar" />
+        <fileset dir="${lib.merge.dir}" includes="*.jar" />
+        <fileset dir="${lib.web.dir}" includes="*.jar" />
+    </path>
+
+    <path id="jspc.dependencies">
+        <path refid="compile.dependencies" />
+    </path>
+
+    <!-- ======================================================================================= -->
+    <!-- TARGETs                                                                                 -->
+    <!-- ======================================================================================= -->
+
+    <!-- init ================================================================================== -->
+    <target name="init">
+        <tstamp />
+        <!-- Check for Ant 1.6 -->
+        <antcall target="-check-ant"/>
+        <!-- Check for Whack -->
+        <antcall target="-check-openfire" />
+    </target>
+
+    <!-- compile =============================================================================== -->
+    <target name="compile" depends="init" description="Compiles code">
+        <mkdir dir="${compile.core.dir}" />
+        <javac
+            destdir="${compile.core.dir}"
+            includeAntRuntime="no"
+            debug="on"
+            source="1.5"
+            target="1.5"
+        >
+            <src path="${src.core.dir}" />
+            <patternset refid="compile.sources" />
+            <classpath>
+                <path refid="compile.dependencies" />
+            </classpath>
+        </javac>
+
+        <!-- Before compiling the plugin call the 'jar' target of the Openfire build. The
+             plugin in this project relies on openfire's classes
+        -->
+
+        <!-- Before compiling the plugin call the 'jar' target of the Openfire build. The
+             plugin in this project relies on Openfire's classes
+        -->
+        <ant antfile="build/build.xml" dir="${openfire.home}" inheritall="false" inheritrefs="false" target="openfire">
+            <property name="ant.version" value="${ant.version}" />
+        </ant>
+
+        <mkdir dir="${compile.plugin.dir}" />
+
+        <javac
+            destdir="${compile.plugin.dir}"
+            includeAntRuntime="no"
+            debug="on"
+            source="1.5"
+            target="1.5"
+        >
+            <src path="${src.plugin.dir}" />
+            <patternset refid="compile.sources" />
+            <classpath>
+                <path refid="compile.dependencies" />
+                <pathelement location="${src.core.dir}" />
+            </classpath>
+            <classpath>
+                <fileset dir="${openfire.home}/target/openfire/lib" includes="*.jar" />
+            </classpath>
+        </javac>
+    </target>
+
+    <!-- jspc ================================================================================== -->
+    <target name="jspc" depends="compile" description="Compiles all JSP pages in the webchat">
+        <mkdir dir="${jspc.dest.dir}" />
+        <mkdir dir="${jspc.dest.dir}/lib" />
+        <mkdir dir="${jspc.dest.dir}/WEB-INF" />
+        <mkdir dir="${jspc.dest.dir}/WEB-INF/lib" />
+        <mkdir dir="${jspc.java.dest.dir}" />
+        <mkdir dir="${jspc.classes.dest.dir}" />
+
+        <antcall target="-jspc-impl" />
+
+        </target><target name="-jspc-impl" unless="no.jspc">
+
+        <!-- Have to use Tomcat 5's JspC task, not the default Ant one -->
+        <taskdef classname="org.apache.jasper.JspC" name="jasper2" >
+            <classpath id="jspc.classpath">
+                <pathelement location="${java.home}/../lib/tools.jar" />
+                <pathelement path="${compile.core.dir}" />
+                <path refid="jspc.dependencies" />
+            </classpath>
+        </taskdef>
+
+        <!-- JSP to JAVA -->
+        <jasper2
+            validateXml="false"
+            uriroot="${src.webapp.dir}"
+            outputDir="${jspc.java.dest.dir}"
+            package="org.jivesoftware.webclient.jsp"
+            webXml="${jspc.dest.dir}/WEB-INF/web.xml.generated" />
+
+        <!-- Compile java source -->
+        <javac
+            destdir="${jspc.classes.dest.dir}"
+            includeAntRuntime="no"
+            debug="on"
+            source="1.5"
+            target="1.5"
+            includes="org/jivesoftware/webclient/jsp/**/*.java"
+        >
+            <src path="${jspc.java.dest.dir}" />
+            <classpath>
+                <pathelement path="${compile.core.dir}" />
+                <path refid="jspc.dependencies" />
+            </classpath>
+        </javac>
+
+        <!-- Jar the compile jsp's -->
+        <jar basedir="${jspc.classes.dest.dir}" jarfile="${jspc.dest.dir}/WEB-INF/lib/plugin-webclient-jspc.jar" />
+
+    </target>
+
+    <!-- jar =================================================================================== -->
+    <target name="jar" depends="compile" unless="no.jspc" description="Creates fastpath client jar and Openfire plugin jar">
+        <jar basedir="${compile.core.dir}" jarfile="${target.dir}/${jar.core.name}">
+            <manifest>
+                <attribute name="Built-By" value="Jive Software ${DSTAMP}"/>
+            </manifest>
+            <zipgroupfileset dir="${lib.merge.dir}" includes="*.jar" />
+        </jar>
+        <copy file="${src.plugin.dir}/conf/plugin.xml" todir="${target.plugin.dir}" />
+        <copy file="${src.plugin.dir}/conf/logo_small.gif" todir="${target.plugin.dir}" /> 
+        <copy file="${src.plugin.dir}/conf/logo_large.gif" todir="${target.plugin.dir}" />
+        <!-- Plugin jar -->
+        <jar basedir="${compile.plugin.dir}" jarfile="${target.plugin.dir}/${jar.plugin.name}" />
+    </target>
+
+    <!-- war =================================================================================== -->
+    <target name="war" depends="jar, jspc" description="Creates a war of all LA client code.">
+        <war file="${target.war.dir}/${war.core.name}" webxml="${src.webapp.dir}/WEB-INF/web.xml">
+            <fileset dir="${src.webapp.dir}" excludes="WEB-INF/**/*.*,*.iml" />
+            <webinf dir="${src.webapp.dir}/WEB-INF" excludes="**/lib/*.txt,chat-settings.xml" />
+            <lib dir="${target.dir}" includes="${jar.core.name}" />
+        </war>
+    </target>
+
+    <!-- deploywar ============================================================================= -->
+    <target name="deploywar" depends="war" description="Deploys the war to the 'deploy.dir' target dir.">
+        <mkdir dir="${deploy.dir}" />
+        <copy todir="${deploy.dir}" file="${target.war.dir}/${war.core.name}" />
+    </target>
+
+    <!-- plugin ================================================================================ -->
+    <target name="plugin" depends="war" description="Creates webchat plugin for Openfire.">
+        <!-- Copy the generated plugin jar to a lib dir so it can be included in the war
+             plugin inside of a 'lib' dir (yes, it's sorta complicated).
+        -->
+        <copy todir="${target.plugin.dir}/temp/lib" file="${target.plugin.dir}/${jar.plugin.name}" />
+        <jar jarfile="${target.plugin.dir}/${war.plugin.name}">
+            <zipfileset src="${target.war.dir}/${war.core.name}" />
+            <fileset dir="${src.plugin.dir}/conf" includes="*.*" />
+            <fileset dir="${target.plugin.dir}/temp" includes="lib/${jar.plugin.name}" />
+            <fileset dir="${jspc.dest.dir}" includes="WEB-INF/web.xml.generated" />
+            <fileset dir="${jspc.dest.dir}" includes="WEB-INF/lib/plugin-webclient-jspc.jar" />
+        </jar>
+        <!-- Also copy the plugin jar to the Openfire plugin target directory. Try to make
+             the Openfire target plugins dir so the copy is valid.
+        -->
+        <mkdir dir="${openfire.home}/target/openfire/plugins" />
+        <copy todir="${openfire.home}/target/openfire/plugins" file="${target.plugin.dir}/${war.plugin.name}" />
+    </target>
+
+    <!-- clean ================================================================================= -->
+    <target name="clean" description="Deletes build output">
+        <delete dir="${target.dir}" />
+    </target>
+
+    <!-- ======================================================================================= -->
+    <!-- "PRIVATE" TARGETS                                                                       -->
+    <!-- ======================================================================================= -->
+
+    <!-- -check-ant ============================================================================ -->
+    <target name="-check-ant">
+         <condition property="ant.not.ok" value="true">
+            <not>
+                <or>
+                    <contains string="${ant.version}" substring="1.6"/>
+                    <contains string="${ant.version}" substring="1.7"/>
+                </or>
+            </not>
+        </condition>
+        <fail if="ant.not.ok" message="Must use Ant 1.6 or 1.7 to build." />
+    </target>
+
+    <!-- -check-openfire ====================================================================== -->
+    <target name="-check-openfire">
+        <available file="${openfire.home}/build/build.xml" property="openfire.not.ok" />
+        <fail unless="openfire.not.ok" message="Must point to Openfire CVS project root directory (openfire.home)" />
+    </target>
+
+</project>

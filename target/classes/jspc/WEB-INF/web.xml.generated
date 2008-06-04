@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+<!--
+Automatically created by Tomcat JspC.
+-->
+<web-app>
+
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.agent_002dimage_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.agent_002dimage_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.agentinfo_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.agentinfo_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.chat_002dended_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.chat_002dended_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.chatmain_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.chatmain_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.chatroom_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.chatroom_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.contact_002dagent_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.contact_002dagent_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.exit_002dqueue_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.exit_002dqueue_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.exit_002dwindow_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.exit_002dwindow_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.fatal_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.fatal_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.framemain_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.framemain_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.helpwin_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.helpwin_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.index_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.index_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.jivelive_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.jivelive_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.lostconnection_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.lostconnection_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.queue_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.queue_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.queue_005fupdater_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.queue_005fupdater_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.request_002dagent_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.request_002dagent_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.setup_002dcompleted_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.setup_002dcompleted_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.setup_002dfinished_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.setup_002dfinished_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.setup_002dindex_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.setup_002dindex_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.start_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.start_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.style_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.style_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.submitter_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.submitter_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.test_002dconnection_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.test_002dconnection_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.transcriptmain_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.transcriptmain_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.transcriptprint_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.transcriptprint_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.transcriptsrc_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.transcriptsrc_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.userinfo_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.userinfo_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.view_002dqueue_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.view_002dqueue_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.include.global_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.include.global_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.email.leave_002da_002dmessage_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.email.leave_002da_002dmessage_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.jivesoftware.webclient.jsp.email.offline_002dmail_jsp</servlet-name>
+        <servlet-class>org.jivesoftware.webclient.jsp.email.offline_002dmail_jsp</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.agent_002dimage_jsp</servlet-name>
+        <url-pattern>/agent-image.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.agentinfo_jsp</servlet-name>
+        <url-pattern>/agentinfo.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.chat_002dended_jsp</servlet-name>
+        <url-pattern>/chat-ended.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.chatmain_jsp</servlet-name>
+        <url-pattern>/chatmain.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.chatroom_jsp</servlet-name>
+        <url-pattern>/chatroom.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.contact_002dagent_jsp</servlet-name>
+        <url-pattern>/contact-agent.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.exit_002dqueue_jsp</servlet-name>
+        <url-pattern>/exit-queue.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.exit_002dwindow_jsp</servlet-name>
+        <url-pattern>/exit-window.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.fatal_jsp</servlet-name>
+        <url-pattern>/fatal.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.framemain_jsp</servlet-name>
+        <url-pattern>/framemain.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.helpwin_jsp</servlet-name>
+        <url-pattern>/helpwin.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.index_jsp</servlet-name>
+        <url-pattern>/index.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.jivelive_jsp</servlet-name>
+        <url-pattern>/jivelive.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.lostconnection_jsp</servlet-name>
+        <url-pattern>/lostconnection.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.queue_jsp</servlet-name>
+        <url-pattern>/queue.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.queue_005fupdater_jsp</servlet-name>
+        <url-pattern>/queue_updater.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.request_002dagent_jsp</servlet-name>
+        <url-pattern>/request-agent.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.setup_002dcompleted_jsp</servlet-name>
+        <url-pattern>/setup-completed.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.setup_002dfinished_jsp</servlet-name>
+        <url-pattern>/setup-finished.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.setup_002dindex_jsp</servlet-name>
+        <url-pattern>/setup-index.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.start_jsp</servlet-name>
+        <url-pattern>/start.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.style_jsp</servlet-name>
+        <url-pattern>/style.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.submitter_jsp</servlet-name>
+        <url-pattern>/submitter.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.test_002dconnection_jsp</servlet-name>
+        <url-pattern>/test-connection.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.transcriptmain_jsp</servlet-name>
+        <url-pattern>/transcriptmain.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.transcriptprint_jsp</servlet-name>
+        <url-pattern>/transcriptprint.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.transcriptsrc_jsp</servlet-name>
+        <url-pattern>/transcriptsrc.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.userinfo_jsp</servlet-name>
+        <url-pattern>/userinfo.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.view_002dqueue_jsp</servlet-name>
+        <url-pattern>/view-queue.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.include.global_jsp</servlet-name>
+        <url-pattern>/include/global.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.email.leave_002da_002dmessage_jsp</servlet-name>
+        <url-pattern>/email/leave-a-message.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.jivesoftware.webclient.jsp.email.offline_002dmail_jsp</servlet-name>
+        <url-pattern>/email/offline-mail.jsp</url-pattern>
+    </servlet-mapping>
+
+</web-app>
+

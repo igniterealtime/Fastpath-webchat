@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+    <display-name>Spark Fastpath Webchat</display-name>
+    <description>Customer Chat web application.</description>
+
+    <!-- branding -->
+    <context-param>
+        <param-name>branding</param-name>
+        <param-value>default</param-value>
+    </context-param>
+    <context-param>
+        <param-name>brandingTitle</param-name>
+        <param-value>Webchat: Spark Fastpath</param-value>
+    </context-param>
+
+    <!-- Uncomment to specify your own logging
+    <context-param>
+        <param-name>logging</param-name>
+        <param-value>file://c:/log_file.log</param-value>
+    </context-param>
+    -->
+
+    <!-- Uncomment to specify your own location for the settings file
+    <context-param>
+        <param-name>settings</param-name>
+        <param-value>file://c:/my_settings.xml</param-value>
+    </context-param>
+    -->
+
+    <filter>
+        <filter-name>SetupFilter</filter-name>
+        <filter-class>org.jivesoftware.webchat.SetupFilter</filter-class>
+        <init-param>
+            <param-name>errorPage</param-name>
+            <param-value>fatal.jsp</param-value>
+        </init-param>
+    </filter>
+     <filter>
+        <filter-name>CharacterEncoder</filter-name>
+        <filter-class>org.jivesoftware.webchat.SetCharacterEncodingFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>SetupFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+     <filter-mapping>
+        <filter-name>CharacterEncoder</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+    <!-- Servlets -->
+    <servlet>
+        <servlet-name>FastpathServlet</servlet-name>
+        <servlet-class>org.jivesoftware.webchat.FastpathServlet</servlet-class>
+        <!-- Uncomment to have console debugger enabled
+        <init-param>
+           <param-name>smackDebugger</param-name>
+           <param-value>org.jivesoftware.smackx.debugger.ConsoleDebugger</param-value>
+        </init-param>
+        -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>ImageServlet</servlet-name>
+        <servlet-class>org.jivesoftware.webchat.servlets.ImageServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DynamicImageServlet</servlet-name>
+        <servlet-class>org.jivesoftware.webchat.servlets.DynamicImageServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SoundServlet</servlet-name>
+        <servlet-class>org.jivesoftware.webchat.sounds.SoundServlet</servlet-class>
+    </servlet>
+
+
+    <!-- Adding Direct Web Remoting Servlet -->
+    <servlet>
+        <servlet-name>dwr-invoker</servlet-name>
+        <display-name>DWR Servlet</display-name>
+        <description>Direct Web Remoter Servlet</description>
+        <servlet-class>uk.ltd.getahead.dwr.DWRServlet</servlet-class>
+        <!--
+        <init-param>
+            <param-name>debug</param-name>
+            <param-value>true</param-value>
+            <description>Do we startup in debug/test mode?</description>
+        </init-param>
+        -->
+        <load-on-startup>-1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dwr-invoker</servlet-name>
+        <url-pattern>/dwr/*</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- Servlet mappings -->
+    <servlet-mapping>
+        <servlet-name>FastpathServlet</servlet-name>
+        <url-pattern>/live/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ImageServlet</servlet-name>
+        <url-pattern>/getimage</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DynamicImageServlet</servlet-name>
+        <url-pattern>/dynoimages/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SoundServlet</servlet-name>
+        <url-pattern>/sounds/*</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- Session config -->
+    <session-config>
+        <session-timeout>1</session-timeout>
+    </session-config>
+    <mime-mapping>
+        <extension>jnlp</extension>
+        <mime-type>application/x-java-jnlp-file</mime-type>
+    </mime-mapping>
+
+    <!-- Welcome file list -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+    <taglib>
+        <taglib-uri>http://xmlns.oracle.com/j2ee/jsp/tld/ojsp/email.tld</taglib-uri>
+        <taglib-location>/WEB-INF/lib/email.jar</taglib-location>
+    </taglib>
+    <taglib>
+        <taglib-uri>http://jakarta.apache.org/taglibs/mailer-1.1</taglib-uri>
+        <taglib-location>/WEB-INF/taglibs-mailer.tld</taglib-location>
+    </taglib>
+</web-app>

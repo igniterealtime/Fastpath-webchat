@@ -1,0 +1,5 @@
+commons-el.jar		?.?	
+commons-logging.jar	?.?
+jasper-compiler.jar	?.?
+jasper-runtime.jar	?.?
+servlet.jar		2.4	Servlet API
