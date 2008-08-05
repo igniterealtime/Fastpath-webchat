@@ -14,6 +14,7 @@
          import = "org.jivesoftware.webchat.*,
                    java.util.Map,
                    org.jivesoftware.webchat.util.FormText" %><%@ page import="com.jivesoftware.smack.workgroup.settings.SoundSettings"%><%@ page import="org.jivesoftware.smack.XMPPException"%><%@ page import="org.jivesoftware.webchat.util.WebUtils"%>
+<%@ page import="org.jivesoftware.webchat.util.StringUtils" %>
 <script type='text/javascript' src='<%= request.getContextPath()%>/dwr/interface/room.js'></script>
 <script type='text/javascript' src='<%= request.getContextPath()%>/dwr/engine.js'></script>
 
@@ -42,7 +43,7 @@
     <link rel="stylesheet" type="text/css" href="style.jsp"/>
 
     <script language="JavaScript" type="text/javascript">
-     var nickname = '<%= userNickname %>';
+     var nickname = '<%= StringUtils.escapeHTMLTags(userNickname) %>';
      var isRedirecting = false;
 
      var checker = 0;
@@ -62,7 +63,7 @@
          var t = new Date().getTime();
          if(t > (lastChecked + 60000) && lastChecked != 0){
             chatHasEnded();
-            alert("The connection to the conversation has been lost. Please close the window and try again.");
+            alert("The connection to the conversatinicknamon has been lost. Please close the window and try again.");
             window.close();
          }
 
@@ -93,13 +94,13 @@
             var val = chatbox.value;
 
             // submit the form to the servlet
-            room.sendMessage(null, '<%= chatID %>', val);
+            room.sendMessage(null, '<%= StringUtils.escapeHTMLTags(chatID) %>', val);
 
             // apply filters
             val = applyFilters(val);
 
             // put text in yak frame
-            addChatText(window.frames['yak'],'<%= userNickname%>', val);
+            addChatText(window.frames['yak'],'<%= StringUtils.escapeHTMLTags(userNickname)%>', val);
 
             scrollYakToEnd(window.frames['yak']);
 
@@ -112,7 +113,7 @@
             if (sounds != null && sounds.checked) {
                 // play outgoing sound, if enabled
                 document.getElementById("sounds").innerHTML=
-                    "<embed src='<%= request.getContextPath()%>/sounds?workgroup=<%=workgroup%>&action=outgoing' style=display:none; hidden=true autostart=true loop=false>";
+                    "<embed src='<%= request.getContextPath()%>/sounds?workgroup=<%=StringUtils.URLEncode(workgroup, "utf-8")%>&action=outgoing' style=display:none; hidden=true autostart=true loop=false>";
             }
         }
         // reset the chatbox textarea
@@ -131,12 +132,12 @@
       defaultOptions += "width=" + width + ",height=" + height;
       cobrowseWin = window.open(url, 'cobrowser', defaultOptions);
 
-      room.sendMessage(null, '<%= chatID %>', 'I have accepted the Cobrowse invitation for '+url);
+      room.sendMessage(null, '<%= StringUtils.escapeHTMLTags(chatID) %>', 'I have accepted the Cobrowse invitation for '+url);
     }
 
     function checkUnload(){
       if(!isRedirecting){
-         window.location.href = 'exit-queue.jsp?workgroup=<%=workgroup%>&chatID=<%=chatID%>';
+         window.location.href = 'exit-queue.jsp?workgroup=<%=StringUtils.URLEncode(workgroup, "utf-8")%>&chatID=<%=StringUtils.URLEncode(chatID, "utf-8")%>';
       }
     }
 
@@ -220,7 +221,7 @@
     <script language="JavaScript" type="text/javascript">
      function showTranscriptWindow(message) {
         isRedirecting = true;
-        location.href = 'transcriptmain.jsp?workgroup=<%= workgroup %>&chatID=<%= chatID%>';
+        location.href = 'transcriptmain.jsp?workgroup=<%= StringUtils.URLEncode(workgroup, "utf-8") %>&chatID=<%= StringUtils.URLEncode(chatID, "utf-8")%>';
      }
 
      function confirmExit(){
@@ -237,7 +238,7 @@
       if(initialAgent == null){
          %>
            alert("We are unable to connect you to an agent. Please try back later.")
-           window.location.href = "userinfo.jsp?workgroup=<%= workgroup %>&chatID=<%= chatID %>";
+           window.location.href = "userinfo.jsp?workgroup=<%= StringUtils.URLEncode(workgroup, "utf-8") %>&chatID=<%= StringUtils.URLEncode(chatID, "utf-8") %>";
          <%
       }
     %>
@@ -259,11 +260,11 @@
     <%-- iframe for main chat transcript --%>
     <table height="100%" width="100%" cellpadding="3" cellspacing="0">
     <tr valign="top">
-    <td> <img src="getimage?image=logo&workgroup=<%= workgroup %>"/></td>
+    <td> <img src="getimage?image=logo&workgroup=<%= StringUtils.URLEncode(workgroup, "utf-8") %>"/></td>
      <td align="right" colspan="3">
      <a href="#" onclick="confirmExit();return false;"
         title="Click to end session.">
-     <img src="getimage?image=end&workgroup=<%= workgroup %>" border="0">
+     <img src="getimage?image=end&workgroup=<%= StringUtils.URLEncode(workgroup, "utf-8") %>" border="0">
      </a>
      </td>
     </tr>
@@ -294,7 +295,7 @@
       <textarea class="box" cols="40" rows="4" name="chatbox" wrap="virtual"  style="width:100%;height:50px;overflow:hidden;"></textarea>
     </td></form>
     <td align="right" width="1%" nowrap valign="top">
-     <img src="getimage?image=sendmessage&workgroup=<%= workgroup %>"
+     <img src="getimage?image=sendmessage&workgroup=<%= StringUtils.URLEncode(workgroup, "utf-8") %>"
          alt="Send Message"
          title="Send Message"
          onclick="javascript:submitMessage();"/>
@@ -306,7 +307,7 @@
                 <td colspan="4">
          <table width="100%" cellpadding="0" cellspacing="0">
              <tr valign="bottom"><td height="30"> <div id="typingAgent"></div></td>
-             <td></td>
+             <td>
              <% if (request.isSecure()) { %>
                                         <div id="isSecure">
                                             <img src="images/secure_button.gif" border="0"/>
@@ -315,7 +316,7 @@
                 </td>
          </table>
 
- <div style="position:absolute;bottom:0px;right:5px"><img src="getimage?image=poweredby&workgroup=<%= workgroup %>"/></div>
+ <div style="position:absolute;bottom:0px;right:5px"><img src="getimage?image=poweredby&workgroup=<%= StringUtils.URLEncode(workgroup, "utf-8") %>"/></div>
 
 
     <script>
@@ -332,7 +333,7 @@
 
    function isTyping(agentIsTyping){
      if(agentIsTyping){
-        document.getElementById('typingAgent').innerHTML = '<img src="getimage?image=agenttyping&workgroup=<%= workgroup %>" />'
+        document.getElementById('typingAgent').innerHTML = '<img src="getimage?image=agenttyping&workgroup=<%= StringUtils.URLEncode(workgroup, "utf-8") %>" />'
      }
      else {
         document.getElementById('typingAgent').innerHTML = ''
@@ -346,7 +347,7 @@
 
         chatHasEnded();
 
-        room.getEndMessage(showEndMessage, '<%= chatID%>', '<%=workgroup%>');
+        room.getEndMessage(showEndMessage, '<%= StringUtils.escapeHTMLTags(chatID)%>', '<%=StringUtils.escapeHTMLTags(workgroup)%>');
         return;
       }
 
@@ -369,14 +370,14 @@
       if(messages.length > 0 && !messages[0].cobrowsing){
         scrollYakToEnd(window.frames['yak']);
         document.getElementById('typingAgent').innerHTML = ''
-        room.clearAgentTyping(null, '<%= chatID %>');
+        room.clearAgentTyping(null, '<%= StringUtils.escapeHTMLTags(chatID) %>');
 
         var hasSounds = document.getElementById("soundsEnabled");
 
         if (hasSounds != null && document.getElementById("soundsEnabled").checked) {
           // play incoming sound, if enabled
           document.getElementById("sounds").innerHTML=
-              "<embed src='<%= request.getContextPath()%>/sounds?workgroup=<%=workgroup%>&action=incoming' style=display:none; hidden=true autostart=true loop=false>";
+              "<embed src='<%= request.getContextPath()%>/sounds?workgroup=<%=StringUtils.URLEncode(workgroup,"utf-8")%>&action=incoming' style=display:none; hidden=true autostart=true loop=false>";
         }
 
         // blink the window -- IE only

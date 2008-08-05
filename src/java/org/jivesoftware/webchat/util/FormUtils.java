@@ -34,7 +34,7 @@ public class FormUtils {
             if(ModelUtil.hasLength(cookieValue)){
                 insertValue = "value=\""+cookieValue+"\"";
             }
-            builder.append("<input type=\"text\" name=\"" + formField.getVariable() + "\" "+insertValue+" style=\"width:75%\">");
+            builder.append("<input type=\"text\" name=\"" + formField.getVariable() + "\" "+StringUtils.escapeHTMLTags(insertValue)+" style=\"width:75%\">");
         }
         else if (formField.getType().equals(FormField.TYPE_TEXT_MULTI)) {
             builder.append("<textarea name=\"" + formField.getVariable() + "\" cols=\"30\" rows=\"3\">");
@@ -47,7 +47,7 @@ public class FormUtils {
             while (iter.hasNext()) {
                 FormField.Option option = (FormField.Option)iter.next();
                 String selected = option.getValue().equals(cookieValue) ? "selected" : "";
-                builder.append("<option value=\"" + option.getValue() + "\" "+selected+">" + option.getLabel() + "</option>");
+                builder.append("<option value=\"" + StringUtils.escapeHTMLTags(option.getValue()) + "\" "+selected+">" + option.getLabel() + "</option>");
             }
             builder.append("</select>");
         }
@@ -59,7 +59,7 @@ public class FormUtils {
                 String value = option.getLabel();
                 builder.append("<input type=\"checkbox\" value=\"" + value + "\" name=\"" + formField.getVariable() + counter + "\">");
                 builder.append("&nbsp;");
-                builder.append(value);
+                builder.append(StringUtils.escapeHTMLTags(value));
                 builder.append("<br/>");
                 counter++;
             }
@@ -71,7 +71,7 @@ public class FormUtils {
                 String value = option.getLabel();
                 builder.append("<input type=\"radio\" value=\"" + value + "\" name=\"" + formField.getVariable() + "\">");
                 builder.append("&nbsp;");
-                builder.append(value);
+                builder.append(StringUtils.escapeHTMLTags(value));
                 builder.append("<br/>");
             }
         }
@@ -82,7 +82,7 @@ public class FormUtils {
             while (values.hasNext()) {
                 value = " value=\"" + (String)values.next() + "\"";
             }
-            builder.append("<input type=\"hidden\" name=\"" + name + "\" " + value + " />");
+            builder.append("<input type=\"hidden\" name=\"" + name + "\" " + StringUtils.escapeHTMLTags(value) + " />");
         }
         else if (formField.getType().equals(FormField.TYPE_TEXT_PRIVATE)) {
             String cookieValue = getCookieValueForField(formField.getVariable(), request);
@@ -90,7 +90,7 @@ public class FormUtils {
             if(ModelUtil.hasLength(cookieValue)){
                 insertValue = "value=\""+cookieValue+"\"";
             }
-            builder.append("<input type=\"password\" name=\"" + formField.getVariable() + "\" "+insertValue+" style=\"width:75%\">");
+            builder.append("<input type=\"password\" name=\"" + formField.getVariable() + "\" "+StringUtils.escapeHTMLTags(insertValue)+" style=\"width:75%\">");
         }
 
         return builder.toString();
@@ -153,7 +153,7 @@ public class FormUtils {
                     return "";
                 }
             }
-            String iV = ModelUtil.hasLength(value) ? "value=\"" + value + "\"" : "";
+            String iV = ModelUtil.hasLength(value) ? "value=\"" + StringUtils.escapeHTMLTags(value) + "\"" : "";
             return "<input type=\"hidden\" name=\"" + name + "\" " + iV + " />";
         }
         return "";

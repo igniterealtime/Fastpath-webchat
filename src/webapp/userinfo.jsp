@@ -11,16 +11,13 @@
 --%>
 
 <%@ page  import = "org.jivesoftware.webchat.ChatManager,
-                    org.jivesoftware.webchat.util.ModelUtil,
                     com.jivesoftware.smack.workgroup.user.Workgroup,
                     org.jivesoftware.smackx.Form,
-                    org.jivesoftware.smackx.FormField,
-                    org.jivesoftware.webchat.util.FormUtils,
-                    org.jivesoftware.webchat.util.FormText"
+                    org.jivesoftware.smackx.FormField"
                     errorPage="fatal.jsp"%>
-<%@ page import="org.jivesoftware.smack.util.StringUtils"%>
-<%@ page import="org.jivesoftware.webchat.util.ParamUtils, java.util.*"%>
+<%@ page import="java.util.*"%>
 <%@ page import="org.jivesoftware.webchat.actions.WorkgroupStatus" %>
+<%@ page import="org.jivesoftware.webchat.util.*" %>
 <!-- Get and Set Workgroup -->
 <jsp:useBean class="org.jivesoftware.webchat.ChatUser" id="chatUser" />
 <jsp:setProperty name="chatUser" property="*" />
@@ -40,7 +37,7 @@
 
     Workgroup chatWorkgroup = WorkgroupStatus.getWorkgroup(workgroup);
     if (!chatWorkgroup.isAvailable()) {
-        response.sendRedirect("email/leave-a-message.jsp?workgroup=" + workgroup);
+        response.sendRedirect("email/leave-a-message.jsp?workgroup=" + StringUtils.URLEncode(workgroup, "utf-8"));
         return;
     }
 
@@ -244,7 +241,7 @@
   <body style="margin-top:0px; margin-bottom:20px; margin-right:20px;margin-left:20px" id="defaultwindow">
     <table width="100%" cellpadding="3" cellspacing="2">
     <tr><td colspan="2" height="1%">
-    <img src="getimage?image=logo&workgroup=<%= workgroup %>"/>
+    <img src="getimage?image=logo&workgroup=<%= StringUtils.URLEncode(workgroup, "utf-8") %>"/>
         </td>
     </tr>
       <form name="f" id="f" action="queue.jsp" method="post" onSubmit="return popup(this);">
@@ -252,8 +249,8 @@
             You can do any name-value pairing you like. Such as product=Jive Live Assistant. Such
             data can be used to effectivly route to a particular queue within a workgroup.
        -->
-        <input type="hidden" name="workgroup" value="<%= workgroup %>"/>
-        <input type="hidden" name="chatID" value="<%= chatID %>" />
+        <input type="hidden" name="workgroup" value="<%= StringUtils.escapeHTMLTags(workgroup) %>"/>
+        <input type="hidden" name="chatID" value="<%= StringUtils.escapeHTMLTags(chatID) %>" />
        <!-- End of Hidden Variable identifiers -->
           <tr>
                 <td colspan="2" height="1%">
@@ -302,7 +299,7 @@
 
                  <% // Handle page location
                      if(location != null){ %>
-                     <input type="hidden" name="location" value="<%= location%>" />
+                     <input type="hidden" name="location" value="<%= StringUtils.escapeHTMLTags(location)%>" />
                  <% } %>
               </td>
                 <td> <input type="submit" name="submitForm" value="<%= startButton%>"/></td>
@@ -312,7 +309,7 @@
             </tr>
            </form>
           </table>
- <div style="position:absolute;bottom:0px;right:5px"><img src="getimage?image=poweredby&workgroup=<%= workgroup %>"/></div>
+ <div style="position:absolute;bottom:0px;right:5px"><img src="getimage?image=poweredby&workgroup=<%= StringUtils.URLEncode(workgroup, "utf-8") %>"/></div>
   </body>
     <%if(!hasElements){ %>
     <script type="text/javascript">
