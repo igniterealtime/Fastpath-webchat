@@ -8,8 +8,8 @@
     <name>Fastpath Webchat</name>
     <description>Web based chat client for Fastpath.</description>
     <author>Jive Software</author>
-    <version>3.5.2</version>
-    <date>6/4/2008</date>
+    <version>3.5.3</version>
+    <date>8/5/2008</date>
     <minServerVersion>3.5.0</minServerVersion>
     <adminconsole>
 
