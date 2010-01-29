@@ -231,19 +231,19 @@
               </form>
             <tr valign="top" style="height:40px;">
                 <td>
-                    <div id="typingAgent"></div>
-                </td>
-                <td>
 <%
                     if (request.isSecure()) {
 %>
                                         <div id="isSecure">
                                             <img src="images/secure_button.gif" border="0"/>
                                         </div>
-                </td>
 <%
                     }
 %>
+                </td>
+                <td>
+                    <div id="typingAgent"></div>
+                </td>
             </tr>
             <tr>
                 <td align="right" colspan="2">

@@ -306,14 +306,16 @@
 
                 <td colspan="4">
          <table width="100%" cellpadding="0" cellspacing="0">
-             <tr valign="bottom"><td height="30"> <div id="typingAgent"></div></td>
-             <td>
+            <tr valign="bottom">
+             <td height="30"> 
              <% if (request.isSecure()) { %>
                                         <div id="isSecure">
-                                            <img src="images/secure_button.gif" border="0"/>
+                                            <img src="getimage?image=secure&workgroup=<%= StringUtils.URLEncode(workgroup, "utf-8") %>" border="0"/>
                                         </div>
              <%}%>
-                </td>
+             </td>
+			 <td> <div id="typingAgent"></div></td>
+			</tr>
          </table>
 
  <div style="position:absolute;bottom:0px;right:5px"><img src="getimage?image=poweredby&workgroup=<%= StringUtils.URLEncode(workgroup, "utf-8") %>"/></div>
