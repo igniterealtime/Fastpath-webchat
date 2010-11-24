@@ -32,9 +32,9 @@ public class FormUtils {
             String cookieValue = getCookieValueForField(formField.getVariable(), request);
             String insertValue = "";
             if(ModelUtil.hasLength(cookieValue)){
-                insertValue = "value=\""+cookieValue+"\"";
+                insertValue = "value=\""+StringUtils.escapeHTMLTags(cookieValue)+"\"";
             }
-            builder.append("<input type=\"text\" name=\"" + formField.getVariable() + "\" "+StringUtils.escapeHTMLTags(insertValue)+" style=\"width:75%\">");
+            builder.append("<input type=\"text\" name=\"" + formField.getVariable() + "\" "+insertValue+" style=\"width:75%\">");
         }
         else if (formField.getType().equals(FormField.TYPE_TEXT_MULTI)) {
             builder.append("<textarea name=\"" + formField.getVariable() + "\" cols=\"30\" rows=\"3\">");
