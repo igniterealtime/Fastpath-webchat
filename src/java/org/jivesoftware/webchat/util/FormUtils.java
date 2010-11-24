@@ -80,17 +80,17 @@ public class FormUtils {
             Iterator values = formField.getValues();
             String value = "";
             while (values.hasNext()) {
-                value = " value=\"" + (String)values.next() + "\"";
+                value = " value=\"" + StringUtils.escapeHTMLTags((String)values.next()) + "\"";
             }
-            builder.append("<input type=\"hidden\" name=\"" + name + "\" " + StringUtils.escapeHTMLTags(value) + " />");
+            builder.append("<input type=\"hidden\" name=\"" + name + "\" " + value + " />");
         }
         else if (formField.getType().equals(FormField.TYPE_TEXT_PRIVATE)) {
             String cookieValue = getCookieValueForField(formField.getVariable(), request);
             String insertValue = "";
             if(ModelUtil.hasLength(cookieValue)){
-                insertValue = "value=\""+cookieValue+"\"";
+                insertValue = "value=\""+StringUtils.escapeHTMLTags(cookieValue)+"\"";
             }
-            builder.append("<input type=\"password\" name=\"" + formField.getVariable() + "\" "+StringUtils.escapeHTMLTags(insertValue)+" style=\"width:75%\">");
+            builder.append("<input type=\"password\" name=\"" + formField.getVariable() + "\" "+insertValue+" style=\"width:75%\">");
         }
 
         return builder.toString();
