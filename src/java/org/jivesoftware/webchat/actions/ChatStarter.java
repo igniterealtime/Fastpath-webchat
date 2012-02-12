@@ -12,8 +12,8 @@
 
 package org.jivesoftware.webchat.actions;
 
-import com.jivesoftware.smack.workgroup.settings.WorkgroupProperties;
-import com.jivesoftware.smack.workgroup.user.Workgroup;
+import org.jivesoftware.smackx.workgroup.settings.WorkgroupProperties;
+import org.jivesoftware.smackx.workgroup.user.Workgroup;
 import org.jivesoftware.webchat.ChatManager;
 import org.jivesoftware.webchat.ChatSession;
 import org.jivesoftware.webchat.providers.MetaDataProvider;

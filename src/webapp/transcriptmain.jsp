@@ -16,7 +16,7 @@
                  org.jivesoftware.smack.XMPPConnection,
                  java.util.Map,
                  org.jivesoftware.webchat.providers.Settings,
-                 com.jivesoftware.smack.workgroup.user.Workgroup,
+                 org.jivesoftware.smackx.workgroup.user.WorkgroupExt,
                  org.jivesoftware.webchat.util.FormText,
                  org.jivesoftware.webchat.util.ParamUtils,
                  org.jivesoftware.smack.util.StringUtils" errorPage="fatal.jsp" %>
@@ -41,7 +41,7 @@
         return;
     }
 
-    Workgroup wgroup = new Workgroup(workgroup, con);
+    WorkgroupExt wgroup = new WorkgroupExt(workgroup, con);
     boolean isEmailConfigured = wgroup.isEmailAvailable();
 
     if(!isEmailConfigured){

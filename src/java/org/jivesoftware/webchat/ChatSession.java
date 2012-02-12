@@ -12,9 +12,9 @@
 
 package org.jivesoftware.webchat;
 
-import com.jivesoftware.smack.workgroup.WorkgroupInvitation;
-import com.jivesoftware.smack.workgroup.WorkgroupInvitationListener;
-import com.jivesoftware.smack.workgroup.user.Workgroup;
+import org.jivesoftware.smackx.workgroup.WorkgroupInvitation;
+import org.jivesoftware.smackx.workgroup.WorkgroupInvitationListener;
+import org.jivesoftware.smackx.workgroup.user.Workgroup;
 import org.jivesoftware.webchat.history.Line;
 import org.jivesoftware.webchat.history.Transcript;
 import org.jivesoftware.webchat.personal.ChatMessage;
@@ -79,6 +79,8 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
 
     private long lastCheck;
 
+    final private long createdTimestamp;
+    
     private String roomName;
 
     private String lastAgent;
@@ -109,6 +111,8 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
         this.emailAddress = emailAddress;
 
         this.userid = userid;
+        
+        this.createdTimestamp = System.currentTimeMillis();
     }
 
     private boolean connect() throws Exception {
@@ -270,9 +274,8 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      */
     public void rejoinQueue() {
         try {
-            //workgroup.joinQueue(metadataMap);
-        }
-        catch (Exception ex) {
+            workgroup.joinQueue(getMetaData(), userid);
+        } catch (Exception ex) {
             WebLog.logError("Error joining queue:", ex);
         }
     }
@@ -492,7 +495,7 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
         String user = StringUtils.parseResource(from);
 
         if (p.getType() == Presence.Type.available) {
-            int count = groupChat.getOccupantsCount();
+            int count = groupChat==null?0:groupChat.getOccupantsCount();
             if (!user.equals(name)) {
                 if (count > 2) {
                     ChatMessage message = new ChatMessage(packet);
@@ -696,5 +699,9 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
 
     public String getLastAgentInRoom() {
         return lastAgent;
+    }
+
+	public long getCreatedTimestamp() {
+        return createdTimestamp;
     }
 }

@@ -36,7 +36,7 @@
         }
 
         function startChat() {
-            chat.startChat(null, '<%= jid %>', '<%= userNickname %>', '<%= email%>', '<%= question %>');
+            chat.startChat('<%= jid %>', '<%= userNickname %>', '<%= email%>', '<%= question %>', null);
             addChatText(window.frames['yak'], '', 'I\'ll be with you in a moment. Please wait.');
         }
         function checkForNewMessages() {
@@ -100,7 +100,7 @@
         if (chatbox.value.trim() != "") {
             var val = chatbox.value;
 
-            chat.sendMessage(null, val);
+            chat.sendMessage(val, null);
 
             // apply filters
             val = applyFilters(val);

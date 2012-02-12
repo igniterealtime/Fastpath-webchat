@@ -3,7 +3,7 @@ email.jar		?.?
 jstl.jar		?.?
 mail.jar		?.?
 standard.jar		?.?
-smack.jar		?.?
-smackx.jar		?.?
-smackx-debug.jar	?.?
-workgroup.jar		?.?
+smackx-debug.jar    ?.?
+smack.jar		3.2.1
+smackx.jar		3.2.1
+dwr 			2.0.8

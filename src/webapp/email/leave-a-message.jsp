@@ -4,8 +4,8 @@
                    org.jivesoftware.webchat.util.ParamUtils,
                    org.jivesoftware.webchat.ChatSession,
                    org.jivesoftware.smack.util.StringUtils,
-                   com.jivesoftware.smack.workgroup.user.Workgroup,
-                   com.jivesoftware.smack.workgroup.settings.OfflineSettings,
+                   org.jivesoftware.smackx.workgroup.user.WorkgroupExt,
+                   org.jivesoftware.smackx.workgroup.settings.OfflineSettings,
                    org.jivesoftware.smack.XMPPException"
                    errorPage="../fatal.jsp"%><%@ page import="java.util.Map"%><%@ page import="java.util.Iterator"%>
 
@@ -38,7 +38,7 @@
 
     XMPPConnection con = chatManager.getGlobalConnection();
 
-    Workgroup offlineWorkgroup = new Workgroup(workgroup, con);
+    WorkgroupExt offlineWorkgroup = new WorkgroupExt(workgroup, con);
     boolean isEmailConfigured = offlineWorkgroup.isEmailAvailable();
     OfflineSettings offlineSettings = null;
     try {

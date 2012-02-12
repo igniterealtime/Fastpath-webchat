@@ -13,8 +13,9 @@
 <%@ page errorPage = "fatal.jsp"
          import = "org.jivesoftware.webchat.*,
                    java.util.Map,
-                   org.jivesoftware.webchat.util.FormText" %><%@ page import="com.jivesoftware.smack.workgroup.settings.SoundSettings"%><%@ page import="org.jivesoftware.smack.XMPPException"%><%@ page import="org.jivesoftware.webchat.util.WebUtils"%>
+                   org.jivesoftware.webchat.util.FormText" %><%@ page import="org.jivesoftware.smackx.workgroup.settings.SoundSettings"%><%@ page import="org.jivesoftware.smack.XMPPException"%><%@ page import="org.jivesoftware.webchat.util.WebUtils"%>
 <%@ page import="org.jivesoftware.webchat.util.StringUtils" %>
+<script type='text/javascript' src='common.js'></script>
 <script type='text/javascript' src='<%= request.getContextPath()%>/dwr/interface/room.js'></script>
 <script type='text/javascript' src='<%= request.getContextPath()%>/dwr/engine.js'></script>
 
@@ -80,11 +81,7 @@
          DWREngine.setErrorHandler(handleError);
          checker = 0;
      }
-    </script>
-
-    <script language="JavaScript" type="text/javascript" src="common.js"></script>
-
-    <script language="JavaScript" type="text/javascript">
+    
       var counter = 0;
       var cobrowseWin;
 
@@ -94,7 +91,7 @@
             var val = chatbox.value;
 
             // submit the form to the servlet
-            room.sendMessage(null, '<%= StringUtils.escapeHTMLTags(chatID) %>', val);
+            room.sendMessage('<%= StringUtils.escapeHTMLTags(chatID) %>', val, null);
 
             // apply filters
             val = applyFilters(val);
@@ -132,7 +129,7 @@
       defaultOptions += "width=" + width + ",height=" + height;
       cobrowseWin = window.open(url, 'cobrowser', defaultOptions);
 
-      room.sendMessage(null, '<%= StringUtils.escapeHTMLTags(chatID) %>', 'I have accepted the Cobrowse invitation for '+url);
+      room.sendMessage('<%= StringUtils.escapeHTMLTags(chatID) %>', 'I have accepted the Cobrowse invitation for '+url, null);
     }
 
     function checkUnload(){
@@ -142,7 +139,7 @@
     }
 
     function isTypingNotification() {
-	   room.customerIsTyping(null, '<%= chatID%>');
+	   room.customerIsTyping('<%= chatID%>', null);
     }
 
     function chatHasEnded(){
@@ -325,12 +322,12 @@
     var timeOut;
 
     function checkForNewMessages() {
-       room.getAllMessages(insertMessages, '<%= chatID %>');
+       room.getAllMessages('<%=chatID%>', insertMessages);
        lastChecked = new Date().getTime();
     }
 
     function checkIfAgentTyping() {
-        room.isTyping(isTyping, '<%= chatID %>');
+        room.isTyping('<%=chatID%>', isTyping);
    }
 
    function isTyping(agentIsTyping){
@@ -349,7 +346,7 @@
 
         chatHasEnded();
 
-        room.getEndMessage(showEndMessage, '<%= StringUtils.escapeHTMLTags(chatID)%>', '<%=StringUtils.escapeHTMLTags(workgroup)%>');
+        room.getEndMessage('<%= StringUtils.escapeHTMLTags(chatID)%>', '<%=StringUtils.escapeHTMLTags(workgroup)%>', showEndMessage);
         return;
       }
 
@@ -371,8 +368,8 @@
 
       if(messages.length > 0 && !messages[0].cobrowsing){
         scrollYakToEnd(window.frames['yak']);
-        document.getElementById('typingAgent').innerHTML = ''
-        room.clearAgentTyping(null, '<%= StringUtils.escapeHTMLTags(chatID) %>');
+        document.getElementById('typingAgent').innerHTML = '';
+        room.clearAgentTyping('<%= StringUtils.escapeHTMLTags(chatID) %>', null);
 
         var hasSounds = document.getElementById("soundsEnabled");
 

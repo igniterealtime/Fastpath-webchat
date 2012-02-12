@@ -38,14 +38,15 @@ import javax.servlet.ServletContext;
  * @author Derek DeMoro
  */
 public final class ChatManager {
-    private Map sessions;
+    private Map<String, ChatSession> sessions;
     private XMPPConnection globalConnection;
     private ChatSettingsManager chatSettingsManager;
 
-    private static final int MAXIMUM_STALE_SESSION_LENGTH = 30 * 60000;
+    private static final long MAXIMUM_STALE_SESSION_LENGTH = 30 * 60 * 1000;//30 minutes
+    private static final long MAXIMUM_INACTIVE_TIME_IN_MS = 3 * 60 * 1000;//3 minutes
 
-    private static ChatManager singleton;
-    private static final Object LOCK = new Object();
+    private static final ChatManager singleton = new ChatManager();
+    
 
     /**
      * Returns the singleton instance of <CODE>ChatManager</CODE>,
@@ -55,15 +56,6 @@ public final class ChatManager {
      * @return the singleton instance of <Code>ChatManager</CODE>
      */
     public static ChatManager getInstance() {
-        // Synchronize on LOCK to ensure that we don't end up creating
-        // two singletons.
-        synchronized (LOCK) {
-            if (null == singleton) {
-                ChatManager controller = new ChatManager();
-                singleton = controller;
-                return controller;
-            }
-        }
         return singleton;
     }
 
@@ -74,10 +66,10 @@ public final class ChatManager {
         sessions = Collections.synchronizedMap(new HashMap());
 
         // Setup timer to check for lingering sessions.
-        Timer timer = new Timer();
+        final Timer timer = new Timer();
 
-        int delay = 10000;   // delay for 5 sec.
-        int period = 10000;  // repeat every sec.
+        final long delay = 5 * 1000; // delay for 5 sec.
+        final long period = 30 * 1000; // repeat every 30 sec.
 
         final TimerTask closeSessionTask = new TimerTask() {
             public void run() {
@@ -88,21 +80,21 @@ public final class ChatManager {
     }
 
     private void removeStaleChats() {
-        final Iterator chatSessions = new ArrayList(getChatSessions()).iterator();
+        final Iterator<ChatSession> chatSessions = new ArrayList<ChatSession>(getChatSessions()).iterator();
+        final long now = System.currentTimeMillis();
         while (chatSessions.hasNext()) {
-            ChatSession chatSession = (ChatSession)chatSessions.next();
-            long lastCheck = chatSession.getLastCheck();
+            final ChatSession chatSession = chatSessions.next();
+            final long lastCheck = chatSession.getLastCheck();
             if (chatSession.isClosed()) {
-                if (lastCheck < new Date().getTime() - MAXIMUM_STALE_SESSION_LENGTH) {
+                if (lastCheck < now - MAXIMUM_STALE_SESSION_LENGTH) {
                     removeChatSession(chatSession.getSessionID());
                 }
-            }
-            else {
-                // If the last time the user check for new messages is greater than one minute,
+            } else {
+                // If the last time the user check for new messages is greater than timeOut,
                 // then we can assume the user has closed to window and has not explicitly closed the connection.
-                if (((System.currentTimeMillis() - lastCheck > 60000) && lastCheck != 0)) {
-                    //System.out.println("Closing Chat session due to no check for messages within the last 15 seconds. Timeout is for user " + chatSession.getNickname() + " on " + new Date());
-
+                if (lastCheck != 0 && (now - lastCheck > MAXIMUM_INACTIVE_TIME_IN_MS)) {
+                    // System.out.println("Closing Chat session due to no check for messages within the last 15 seconds. Timeout is for user " +
+                    // chatSession.getNickname() + " on " + new Date());
                     // Close Chat Session
                     chatSession.close();
 
@@ -110,8 +102,9 @@ public final class ChatManager {
                     removeChatSession(chatSession.getSessionID());
                 }
                 // Handle case where the user never joins a conversation and leaves the queue.
-                else if (lastCheck == 0 && !chatSession.isInQueue()) {
+                else if (lastCheck == 0 && !chatSession.isInQueue() && (now - chatSession.getCreatedTimestamp() > MAXIMUM_INACTIVE_TIME_IN_MS)) {
                     // Close Chat Session
+                    
                     chatSession.close();
 
                     // Remove from cache
@@ -139,7 +132,7 @@ public final class ChatManager {
      * @return the ChatSession associated with the unique ID.
      */
     public ChatSession getChatSession(String chatID) {
-        return (ChatSession)sessions.get(chatID);
+        return sessions.get(chatID);
     }
 
     /**
@@ -149,8 +142,7 @@ public final class ChatManager {
      * @return the ChatSession being removed.
      */
     public ChatSession removeChatSession(String chatID) {
-        ChatSession sess = (ChatSession)sessions.remove(chatID);
-        return sess;
+        return sessions.remove(chatID);
     }
 
     /**
@@ -158,7 +150,7 @@ public final class ChatManager {
      *
      * @return <code>Collection</code> of <code>ChatSessions</code>
      */
-    public Collection getChatSessions() {
+    public Collection<ChatSession> getChatSessions() {
         return sessions.values();
     }
 

@@ -11,7 +11,7 @@
 --%>
 
 <%@ page  import = "org.jivesoftware.webchat.ChatManager,
-                    com.jivesoftware.smack.workgroup.user.Workgroup,
+                    org.jivesoftware.smackx.workgroup.user.Workgroup,
                     org.jivesoftware.smackx.Form,
                     org.jivesoftware.smackx.FormField"
                     errorPage="fatal.jsp"%>

@@ -91,7 +91,7 @@
             var isClosing = true;
 
             function checkQueue() {
-                room.getChatQueue(handleQueue, '<%= chatID %>');
+                room.getChatQueue('<%= chatID %>', handleQueue);
             }
             function handleQueue(queue) {
                 if (queue == null) {

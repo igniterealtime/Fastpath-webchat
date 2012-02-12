@@ -11,7 +11,7 @@
 
 package org.jivesoftware.webchat.util;
 
-import com.jivesoftware.smack.workgroup.settings.ChatSetting;
+import org.jivesoftware.smackx.workgroup.settings.ChatSetting;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

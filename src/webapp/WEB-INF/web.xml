@@ -81,7 +81,11 @@
         <servlet-name>dwr-invoker</servlet-name>
         <display-name>DWR Servlet</display-name>
         <description>Direct Web Remoter Servlet</description>
-        <servlet-class>uk.ltd.getahead.dwr.DWRServlet</servlet-class>
+        <servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
+        <init-param>
+            <param-name>crossDomainSessionSecurity</param-name>
+            <param-value>false</param-value>
+        </init-param>
         <!--
         <init-param>
             <param-name>debug</param-name>
@@ -129,6 +133,7 @@
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
+<!--
     <taglib>
         <taglib-uri>http://xmlns.oracle.com/j2ee/jsp/tld/ojsp/email.tld</taglib-uri>
         <taglib-location>/WEB-INF/lib/email.jar</taglib-location>
@@ -137,4 +142,5 @@
         <taglib-uri>http://jakarta.apache.org/taglibs/mailer-1.1</taglib-uri>
         <taglib-location>/WEB-INF/taglibs-mailer.tld</taglib-location>
     </taglib>
+-->
 </web-app>

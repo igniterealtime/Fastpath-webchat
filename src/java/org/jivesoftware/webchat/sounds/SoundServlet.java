@@ -1,7 +1,7 @@
 package org.jivesoftware.webchat.sounds;
 
-import com.jivesoftware.smack.workgroup.user.Workgroup;
-import com.jivesoftware.smack.workgroup.settings.SoundSettings;
+import org.jivesoftware.smackx.workgroup.user.Workgroup;
+import org.jivesoftware.smackx.workgroup.settings.SoundSettings;
 import org.jivesoftware.webchat.ChatManager;
 import org.jivesoftware.webchat.util.WebLog;
 

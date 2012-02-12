@@ -12,9 +12,9 @@
 
 package org.jivesoftware.webchat.util;
 
-import com.jivesoftware.smack.workgroup.settings.ChatSetting;
-import com.jivesoftware.smack.workgroup.settings.ChatSettings;
-import com.jivesoftware.smack.workgroup.user.Workgroup;
+import org.jivesoftware.smackx.workgroup.settings.ChatSetting;
+import org.jivesoftware.smackx.workgroup.settings.ChatSettings;
+import org.jivesoftware.smackx.workgroup.user.Workgroup;
 import org.jivesoftware.webchat.ChatManager;
 import org.jivesoftware.webchat.actions.WorkgroupChangeListener;
 import org.jivesoftware.webchat.actions.WorkgroupStatus;

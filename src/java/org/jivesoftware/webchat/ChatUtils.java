@@ -11,7 +11,7 @@
  */
 package org.jivesoftware.webchat;
 
-import com.jivesoftware.smack.workgroup.user.Workgroup;
+import org.jivesoftware.smackx.workgroup.user.Workgroup;
 import org.jivesoftware.webchat.actions.ChatQueue;
 import org.jivesoftware.webchat.personal.ChatMessage;
 import org.jivesoftware.webchat.util.FormText;

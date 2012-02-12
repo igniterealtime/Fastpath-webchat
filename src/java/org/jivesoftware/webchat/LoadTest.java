@@ -1,14 +1,11 @@
 package org.jivesoftware.webchat;
 
-import com.jivesoftware.smack.workgroup.MetaData;
-import com.jivesoftware.smack.workgroup.agent.AgentSession;
-import com.jivesoftware.smack.workgroup.agent.Offer;
-import com.jivesoftware.smack.workgroup.agent.OfferListener;
-import com.jivesoftware.smack.workgroup.agent.RevokedOffer;
-import org.jivesoftware.smack.ConnectionListener;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.workgroup.MetaData;
+import org.jivesoftware.smackx.workgroup.agent.AgentSession;
+import org.jivesoftware.smackx.workgroup.agent.Offer;
+import org.jivesoftware.smackx.workgroup.agent.OfferListener;
+import org.jivesoftware.smackx.workgroup.agent.RevokedOffer;
+import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
@@ -153,6 +150,11 @@ public class LoadTest {
                             System.out.println(((Message)packet).getBody());
                         }
                     });
+                }
+
+                @Override
+                public void invitationReceived(Connection conn, String room, String inviter, String reason, String password, Message message) {
+                    throw new UnsupportedOperationException();
                 }
             });
 
