@@ -198,21 +198,31 @@ public class ChatStarter extends WebBean {
                 // authentication is required, all users must login
                 String username = (String)metadata.get("username");
                 String password = (String)metadata.get("password");
+                boolean chatloginok=false;
                 try {
                     chatSession.login(username, password);
-                    // load user metadata
-                    properties = wGroup.getWorkgroupProperties(username + "@" + settings.getServerDomain());
-                    metadata.put("name", properties.getFullName());
-                    metadata.put("email", properties.getEmail());
-                    chatSession.setEmailAddress(properties.getEmail());
-                    metadata.remove("password");
+                    chatloginok=true;
                 }
                 catch (Exception e) {
                     try {
+                        WebLog.logError("Authentication failed - ", e);
                         response.sendRedirect("userinfo.jsp?authFailed=true&workgroup=" + workgroup);
                     }
                     catch (IOException redirectException) {
                         WebLog.logError("Error during redirection - ", redirectException);
+                    }
+                }
+                // load user metadata
+                if (chatloginok) {
+                    try {
+                        properties = wGroup.getWorkgroupProperties(username + "@" + settings.getServerDomain());
+                        metadata.put("name", properties.getFullName());
+                        metadata.put("email", properties.getEmail());
+                        chatSession.setEmailAddress(properties.getEmail());
+                        metadata.remove("password");
+                    }
+                    catch (Exception e) {
+                        WebLog.logError("Error setting up workgroup properties - ", e );
                     }
                 }
             }
