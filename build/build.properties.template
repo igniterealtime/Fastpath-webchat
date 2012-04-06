@@ -2,8 +2,8 @@
 # $Revision: 18426 $
 # $Date: 2005-02-10 14:04:46 -0800 (Thu, 10 Feb 2005) $
 
-# Path to Messenger project. Assumed to be a sibling of this CVS respository
-# messenger.home=
+# Path to Openfire project. Assumed to be a sibling of this CVS respository
+# openfire.home=
 
 # Root directory for deploying the LA war (this should the 'webapps' dir of your appserver.
 # deploy.dir=
