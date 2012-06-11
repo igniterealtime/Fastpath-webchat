@@ -21,9 +21,9 @@ import org.jivesoftware.openfire.container.AdminConsolePlugin;
 import org.jivesoftware.openfire.container.Plugin;
 import org.jivesoftware.openfire.container.PluginManager;
 import org.jivesoftware.openfire.XMPPServer;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 import java.io.File;
 import java.util.HashMap;
@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class WebClientPlugin implements Plugin {
 
-    private Context context;
+    private ServletContextHandler context;
 
     public void initializePlugin(PluginManager pluginManager, File pluginDirectory) {
         // Specify it's a demo.
