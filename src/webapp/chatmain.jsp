@@ -64,7 +64,7 @@
          var t = new Date().getTime();
          if(t > (lastChecked + 60000) && lastChecked != 0){
             chatHasEnded();
-            alert("The connection to the conversatinicknamon has been lost. Please close the window and try again.");
+            alert("The connection to the conversation has been lost. Please close the window and try again.");
             window.close();
          }
 
