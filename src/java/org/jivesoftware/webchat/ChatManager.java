@@ -109,46 +109,48 @@ public final class ChatManager {
                 if (lastCheck < now - MAXIMUM_STALE_SESSION_LENGTH_IN_MS) {
                     removeChatSession(chatSession.getSessionID());
                 }
-            } else if (lastCheck != 0) {
-                // If the last time the user check for new messages is greater than timeOut,
-                // then we can assume the user has closed to window and has not explicitly closed the connection.
-                if (now - lastCheck > MAXIMUM_INACTIVE_TIME_IN_MS) {
+            } else {
+                if (lastCheck != 0) {
+                    // If the last time the user check for new messages is greater than timeOut,
+                    // then we can assume the user has closed to window and has not explicitly closed the connection.
+                    if (now - lastCheck > MAXIMUM_INACTIVE_TIME_IN_MS) {
 
-                    // Close Chat Session
-                    chatSession.close();
+                        // Close Chat Session
+                        chatSession.close();
 
-                    // Remove from cache
-                    removeChatSession(chatSession.getSessionID());
-                }
-                // Warn the users that the browser client appears to be unresponsive
-                else if (!chatSession.isInactivityWarningSent() && now - lastCheck > INACTIVE_TIME_WARNING_IN_MS) {
-                    final MultiUserChat chat = chatSession.getGroupChat();
-                    if (chat != null) {
-                        final String inactivityInMs = Long.toString(now - lastCheck);
-                        final String inactivityInSecs = inactivityInMs.substring(0, inactivityInMs.length()-3);
-                        try {
-                            final Message chatMessage = new Message();
-                            chatMessage.setType(Message.Type.groupchat);
-                            chatMessage.setBody("The webchat client connection appears to unstable. Not any data has been received in the last " + inactivityInSecs + " seconds.");
+                        // Remove from cache
+                        removeChatSession(chatSession.getSessionID());
+                    }
+                    // Warn the users that the browser client appears to be unresponsive
+                    else if (!chatSession.isInactivityWarningSent() && now - lastCheck > INACTIVE_TIME_WARNING_IN_MS) {
+                        final MultiUserChat chat = chatSession.getGroupChat();
+                        if (chat != null) {
+                            final String inactivityInMs = Long.toString(now - lastCheck);
+                            final String inactivityInSecs = inactivityInMs.substring(0, inactivityInMs.length()-3);
+                            try {
+                                final Message chatMessage = new Message();
+                                chatMessage.setType(Message.Type.groupchat);
+                                chatMessage.setBody("The webchat client connection appears to unstable. Not any data has been received in the last " + inactivityInSecs + " seconds.");
 
-                            String room = chat.getRoom();
-                            chatMessage.setTo(room);
-                            chat.sendMessage(chatMessage);
+                                String room = chat.getRoom();
+                                chatMessage.setTo(room);
+                                chat.sendMessage(chatMessage);
 
-                            chatSession.setInactivityWarningSent(true);
-                        } catch (XMPPException e) {
-                            WebLog.logError("Error sending message:", e);
+                                chatSession.setInactivityWarningSent(true);
+                            } catch (XMPPException e) {
+                                WebLog.logError("Error sending message:", e);
+                            }
                         }
                     }
-                }
-                // Handle case where the user never joins a conversation and leaves the queue.
-                else if (!chatSession.isInQueue() && (now - chatSession.getCreatedTimestamp() > MAXIMUM_INACTIVE_TIME_IN_MS)) {
-                    // Close Chat Session
-                    
-                    chatSession.close();
+                } else {
+                    // Handle case where the user never joins a conversation and leaves the queue.
+                    if (!chatSession.isInQueue() && (now - chatSession.getCreatedTimestamp() > MAXIMUM_INACTIVE_TIME_IN_MS)) {
 
-                    // Remove from cache
-                    removeChatSession(chatSession.getSessionID());
+                        chatSession.close();
+
+                        // Remove from cache
+                        removeChatSession(chatSession.getSessionID());
+                    }
                 }
             }
         }
