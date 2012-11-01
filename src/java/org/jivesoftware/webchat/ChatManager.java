@@ -12,17 +12,20 @@
 
 package org.jivesoftware.webchat;
 
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.webchat.actions.WorkgroupStatus;
 import org.jivesoftware.webchat.settings.ChatSettingsManager;
 import org.jivesoftware.webchat.settings.ConnectionSettings;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.webchat.util.WebLog;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -42,8 +45,25 @@ public final class ChatManager {
     private XMPPConnection globalConnection;
     private ChatSettingsManager chatSettingsManager;
 
-    private static final long MAXIMUM_STALE_SESSION_LENGTH = 30 * 60 * 1000;//30 minutes
-    private static final long MAXIMUM_INACTIVE_TIME_IN_MS = 3 * 60 * 1000;//3 minutes
+    /**
+     * Chats that are closed but not removed are to be removed after this period.
+     */
+    private static final long MAXIMUM_STALE_SESSION_LENGTH_IN_MS = 30 * 60 * 1000;
+
+    /**
+     * The browser that is used in the webchat session polls regularly for new messages. When these polls do no longer
+     * occur, the chat is said to be 'inactive'. The value defined here defines the amount of milliseconds of
+     * inactiveness after which the chat is to be closed and removed.
+     */
+    private static final long MAXIMUM_INACTIVE_TIME_IN_MS = 60 * 1000;
+
+    /**
+     * The browser that is used in the webchat session polls regularly for new messages. When these polls do no longer
+     * occur, the chat is said to be 'inactive'. The value defined here defines the amount of milliseconds of
+     * inactiveness after which a warning message will be sent to the chat occupants (informing them of potential
+     * connectivity problems).
+     */
+    private static final long INACTIVE_TIME_WARNING_IN_MS = 10 * 1000;
 
     private static final ChatManager singleton = new ChatManager();
     
@@ -68,15 +88,15 @@ public final class ChatManager {
         // Setup timer to check for lingering sessions.
         final Timer timer = new Timer();
 
-        final long delay = 5 * 1000; // delay for 5 sec.
-        final long period = 30 * 1000; // repeat every 30 sec.
-
         final TimerTask closeSessionTask = new TimerTask() {
             public void run() {
                 removeStaleChats();
             }
         };
-        timer.scheduleAtFixedRate(closeSessionTask, delay, period);
+
+        final long delayInMillis = 5 * 1000;
+        final long periodInMillis = 1 * 1000;
+        timer.schedule(closeSessionTask, delayInMillis, periodInMillis);
     }
 
     private void removeStaleChats() {
@@ -86,23 +106,43 @@ public final class ChatManager {
             final ChatSession chatSession = chatSessions.next();
             final long lastCheck = chatSession.getLastCheck();
             if (chatSession.isClosed()) {
-                if (lastCheck < now - MAXIMUM_STALE_SESSION_LENGTH) {
+                if (lastCheck < now - MAXIMUM_STALE_SESSION_LENGTH_IN_MS) {
                     removeChatSession(chatSession.getSessionID());
                 }
-            } else {
+            } else if (lastCheck != 0) {
                 // If the last time the user check for new messages is greater than timeOut,
                 // then we can assume the user has closed to window and has not explicitly closed the connection.
-                if (lastCheck != 0 && (now - lastCheck > MAXIMUM_INACTIVE_TIME_IN_MS)) {
-                    // System.out.println("Closing Chat session due to no check for messages within the last 15 seconds. Timeout is for user " +
-                    // chatSession.getNickname() + " on " + new Date());
+                if (now - lastCheck > MAXIMUM_INACTIVE_TIME_IN_MS) {
+
                     // Close Chat Session
                     chatSession.close();
 
                     // Remove from cache
                     removeChatSession(chatSession.getSessionID());
                 }
+                // Warn the users that the browser client appears to be unresponsive
+                else if (!chatSession.isInactivityWarningSent() && now - lastCheck > INACTIVE_TIME_WARNING_IN_MS) {
+                    final MultiUserChat chat = chatSession.getGroupChat();
+                    if (chat != null) {
+                        final String inactivityInMs = Long.toString(now - lastCheck);
+                        final String inactivityInSecs = inactivityInMs.substring(0, inactivityInMs.length()-3);
+                        try {
+                            final Message chatMessage = new Message();
+                            chatMessage.setType(Message.Type.groupchat);
+                            chatMessage.setBody("The webchat client connection appears to unstable. Not any data has been received in the last " + inactivityInSecs + " seconds.");
+
+                            String room = chat.getRoom();
+                            chatMessage.setTo(room);
+                            chat.sendMessage(chatMessage);
+
+                            chatSession.setInactivityWarningSent(true);
+                        } catch (XMPPException e) {
+                            WebLog.logError("Error sending message:", e);
+                        }
+                    }
+                }
                 // Handle case where the user never joins a conversation and leaves the queue.
-                else if (lastCheck == 0 && !chatSession.isInQueue() && (now - chatSession.getCreatedTimestamp() > MAXIMUM_INACTIVE_TIME_IN_MS)) {
+                else if (!chatSession.isInQueue() && (now - chatSession.getCreatedTimestamp() > MAXIMUM_INACTIVE_TIME_IN_MS)) {
                     // Close Chat Session
                     
                     chatSession.close();

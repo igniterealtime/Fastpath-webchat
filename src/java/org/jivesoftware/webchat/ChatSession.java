@@ -77,7 +77,17 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
 
     private List messageList = new ArrayList();
 
+    /**
+     * The time in milliseconds when the browser last checked for new messages.
+     */
     private long lastCheck;
+
+    /**
+     * Flag that indicates that an inactivity warning has been send. This should be used to prevent multiple warnings
+     * to be generated in the same period of inactivity. It is therefor reset whenever activity from the browser is
+     * detected (OF-508).
+     */
+    private boolean inactivityWarningSent;
 
     final private long createdTimestamp;
     
@@ -447,11 +457,32 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      */
     public List getMessageList() {
         lastCheck = System.currentTimeMillis();
+        inactivityWarningSent = false; // OF-508: reset the flag that determines if inactivity warnings are to be send.
         return messageList;
     }
 
+    /**
+     * Returns The time in milliseconds when the browser last checked for new messages.
+     *
+     * @return timestamp of last message retrieval by browser.
+     */
     public long getLastCheck() {
         return lastCheck;
+    }
+
+    /**
+     * Returns if an inactivity warning has been send for the current period of inactivity (if any). This should be used
+     * to prevent multiple warnings to be generated in the same period of inactivity. It is therefor reset whenever
+     * activity from the browser is detected (OF-508).
+     *
+     * @return <tt>true</tt> if an inactivity warning flag has been set, <tt>false</tt> otherwise.
+     */
+    public boolean isInactivityWarningSent() {
+        return inactivityWarningSent;
+    }
+
+    public void setInactivityWarningSent(boolean inactivityWarningSent) {
+        this.inactivityWarningSent = inactivityWarningSent;
     }
 
     /**
