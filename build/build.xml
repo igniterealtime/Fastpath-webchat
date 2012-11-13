@@ -244,7 +244,7 @@
                 </or>
             </not>
         </condition>
-        <fail if="ant.not.ok" message="Must use Ant 1.6 or 1.7 to build." />
+        <fail if="ant.not.ok" message="Must use Ant 1.6, 1.7 or 1.8 to build." />
     </target>
 
     <!-- -check-openfire ====================================================================== -->
