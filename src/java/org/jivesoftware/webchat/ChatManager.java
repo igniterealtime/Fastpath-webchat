@@ -130,7 +130,7 @@ public final class ChatManager {
                             try {
                                 final Message chatMessage = new Message();
                                 chatMessage.setType(Message.Type.groupchat);
-                                chatMessage.setBody("The webchat client connection appears to unstable. Not any data has been received in the last " + inactivityInSecs + " seconds.");
+                                chatMessage.setBody("The webchat client connection appears to unstable. No data has been received in the last " + inactivityInSecs + " seconds.");
 
                                 String room = chat.getRoom();
                                 chatMessage.setTo(room);
