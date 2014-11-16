@@ -1,6 +1,7 @@
 package org.jivesoftware.smackx.workgroup.ext.email;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.util.StringUtils;
 
 public class EmailIQ extends IQ {
     public static final String ELEMENT_NAME = "send-email";
@@ -15,10 +16,10 @@ public class EmailIQ extends IQ {
     public String getChildElementXML() {
         StringBuilder localStringBuilder = new StringBuilder();
         localStringBuilder.append("<").append("send-email").append(" xmlns=\"").append("http://jivesoftware.com/protocol/workgroup").append("\">");
-        localStringBuilder.append("<fromAddress>").append(getFromAddress()).append("</fromAddress>");
-        localStringBuilder.append("<toAddress>").append(getToAddress()).append("</toAddress>");
-        localStringBuilder.append("<subject>").append(getSubject()).append("</subject>");
-        localStringBuilder.append("<message>").append(getMessage()).append("</message>");
+        localStringBuilder.append("<fromAddress>").append(StringUtils.escapeForXML(getFromAddress())).append("</fromAddress>");
+        localStringBuilder.append("<toAddress>").append(StringUtils.escapeForXML(getToAddress())).append("</toAddress>");
+        localStringBuilder.append("<subject>").append(StringUtils.escapeForXML(getSubject())).append("</subject>");
+        localStringBuilder.append("<message>").append(StringUtils.escapeForXML(getMessage())).append("</message>");
         localStringBuilder.append("<useHTML>").append(Boolean.toString(isHtml())).append("</useHTML>");
         if (getSessionID() != null)
             localStringBuilder.append("<sessionID>").append(getSessionID()).append("</sessionID>");
