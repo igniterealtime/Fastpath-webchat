@@ -235,16 +235,12 @@
 
     <!-- -check-ant ============================================================================ -->
     <target name="-check-ant">
-         <condition property="ant.not.ok" value="true">
+        <condition property="ant.not.ok" value="true">
             <not>
-                <or>
-                    <contains string="${ant.version}" substring="1.6"/>
-                    <contains string="${ant.version}" substring="1.7"/>
-                    <contains string="${ant.version}" substring="1.8"/>
-                </or>
+                <antversion atleast="1.7.1"/>
             </not>
         </condition>
-        <fail if="ant.not.ok" message="Must use Ant 1.6, 1.7 or 1.8 to build." />
+        <fail if="ant.not.ok" message="Must use Ant 1.7.1 or higher to build." />
     </target>
 
     <!-- -check-openfire ====================================================================== -->
