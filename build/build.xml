@@ -214,7 +214,9 @@
         -->
         <copy todir="${target.plugin.dir}/temp/lib" file="${target.plugin.dir}/${jar.plugin.name}" />
         <jar jarfile="${target.plugin.dir}/${war.plugin.name}">
-            <zipfileset src="${target.war.dir}/${war.core.name}" />
+            <zipfileset src="${target.war.dir}/${war.core.name}">
+                <exclude name="**/commons-logging*.jar"/> <!-- provided by Openfire. including it can cause classloading-related issues. -->
+            </zipfileset>
             <fileset dir="${src.plugin.dir}/conf" includes="*.*" />
             <fileset dir="${target.plugin.dir}/temp" includes="lib/${jar.plugin.name}" />
             <fileset dir="${jspc.dest.dir}" includes="WEB-INF/web.xml.generated" />
