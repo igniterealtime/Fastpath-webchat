@@ -1,5 +1,6 @@
 # The repository should not contain IntelliJ project files
 .idea
+out
 **/*.iml
 
 # The repository should not contain the result of project builds
