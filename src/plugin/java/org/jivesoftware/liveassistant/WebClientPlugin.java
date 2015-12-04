@@ -21,11 +21,16 @@ import org.jivesoftware.openfire.container.AdminConsolePlugin;
 import org.jivesoftware.openfire.container.Plugin;
 import org.jivesoftware.openfire.container.PluginManager;
 import org.jivesoftware.openfire.XMPPServer;
-import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.SimpleInstanceManager;
+import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
+import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,14 +59,16 @@ public class WebClientPlugin implements Plugin {
         }
 
         // Add web-app.
+        final List<ContainerInitializer> initializers = new ArrayList<ContainerInitializer>();
+        initializers.add( new ContainerInitializer( new JettyJasperInitializer(), null ) );
 
-        ContextHandlerCollection contexts = ((AdminConsolePlugin)pluginManager.getPlugin("admin")).getContexts();
+        context = new WebAppContext( pluginDirectory.getPath(), File.separator + pluginDirectory.getName() );
+        context.setAttribute( "org.eclipse.jetty.containerInitializers", initializers );
+        context.setAttribute( InstanceManager.class.getName(), new SimpleInstanceManager() );
+        context.setWelcomeFiles( new String[]{"index.jsp"} );
 
-        context = new WebAppContext(pluginDirectory.getPath(),
-                "/" + pluginDirectory.getName());
-        contexts.addHandler(context);
-
-        context.setWelcomeFiles(new String[]{"index.jsp"});
+        final ContextHandlerCollection contexts = ( (AdminConsolePlugin) pluginManager.getPlugin( "admin" ) ).getContexts();
+        contexts.addHandler( context );
 
         // The embedded web server doesn't know how to compile JSPs. Therefore, we have
         // to manually parse a generated web.xml file and add the entries as servlets
