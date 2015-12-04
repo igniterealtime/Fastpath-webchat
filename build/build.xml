@@ -55,9 +55,12 @@
         <fileset dir="${lib.build.dir}" includes="*.jar" />
         <fileset dir="${lib.merge.dir}" includes="*.jar" />
         <fileset dir="${lib.web.dir}" includes="*.jar" />
+        <fileset dir="${openfire.home}/build/lib/merge" includes="*servlet*.jar"/>
+        <fileset dir="${openfire.home}/build/lib/merge" includes="*jasper*.jar"/>
     </path>
 
     <path id="jspc.dependencies">
+        <fileset dir="${openfire.home}/build/lib/merge" includes="*schema*.jar"/>
         <path refid="compile.dependencies" />
     </path>
 
