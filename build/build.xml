@@ -55,9 +55,12 @@
         <fileset dir="${lib.build.dir}" includes="*.jar" />
         <fileset dir="${lib.merge.dir}" includes="*.jar" />
         <fileset dir="${lib.web.dir}" includes="*.jar" />
+        <fileset dir="${openfire.home}/build/lib/merge" includes="*servlet*.jar"/>
+        <fileset dir="${openfire.home}/build/lib/merge" includes="*jasper*.jar"/>
     </path>
 
     <path id="jspc.dependencies">
+        <fileset dir="${openfire.home}/build/lib/merge" includes="*schema*.jar"/>
         <path refid="compile.dependencies" />
     </path>
 
@@ -211,7 +214,9 @@
         -->
         <copy todir="${target.plugin.dir}/temp/lib" file="${target.plugin.dir}/${jar.plugin.name}" />
         <jar jarfile="${target.plugin.dir}/${war.plugin.name}">
-            <zipfileset src="${target.war.dir}/${war.core.name}" />
+            <zipfileset src="${target.war.dir}/${war.core.name}">
+                <exclude name="**/commons-logging*.jar"/> <!-- provided by Openfire. including it can cause classloading-related issues. -->
+            </zipfileset>
             <fileset dir="${src.plugin.dir}/conf" includes="*.*" />
             <fileset dir="${target.plugin.dir}/temp" includes="lib/${jar.plugin.name}" />
             <fileset dir="${jspc.dest.dir}" includes="WEB-INF/web.xml.generated" />
@@ -235,22 +240,18 @@
 
     <!-- -check-ant ============================================================================ -->
     <target name="-check-ant">
-         <condition property="ant.not.ok" value="true">
+        <condition property="ant.not.ok" value="true">
             <not>
-                <or>
-                    <contains string="${ant.version}" substring="1.6"/>
-                    <contains string="${ant.version}" substring="1.7"/>
-                    <contains string="${ant.version}" substring="1.8"/>
-                </or>
+                <antversion atleast="1.7.1"/>
             </not>
         </condition>
-        <fail if="ant.not.ok" message="Must use Ant 1.6, 1.7 or 1.8 to build." />
+        <fail if="ant.not.ok" message="Must use Ant 1.7.1 or higher to build." />
     </target>
 
     <!-- -check-openfire ====================================================================== -->
     <target name="-check-openfire">
         <available file="${openfire.home}/build/build.xml" property="openfire.not.ok" />
-        <fail unless="openfire.not.ok" message="Must point to Openfire CVS project root directory (openfire.home)" />
+        <fail unless="openfire.not.ok" message="Please reference the Openfire project root directory using the openfire.home property. Example: ant -Dopenfire.home=../openfire/" />
     </target>
 
 </project>
