@@ -183,11 +183,6 @@
         <!-- Before compiling the plugin call the 'jar' target of the Openfire build. The
              plugin in this project relies on Openfire's classes
         -->
-        <!-- XXX: Remove dependency on Openfire project - only include necessary jars
-        <ant antfile="build/build.xml" dir="${openfire.home}" inheritall="false" inheritrefs="false" target="openfire">
-            <property name="ant.version" value="${ant.version}" />
-        </ant>
-        -->
 
         <mkdir dir="${compile.plugin.dir}" />
 
@@ -201,7 +196,7 @@
             <patternset refid="compile.sources" />
 
             <classpath>
-                <path refid="compile.dependencies" />
+                <path refid="compile.no-openfire.dependencies" />
                 <pathelement location="${src.core.dir}" />
             </classpath>
 
@@ -233,7 +228,7 @@
         <mkdir dir="${jspc.java.dest.dir}" />
         <mkdir dir="${jspc.classes.dest.dir}" />
 
-        <antcall target="-jspc-impl" />
+        <antcall target="-jspc-impl-no-openfire" />
 
     </target>
         
@@ -269,6 +264,46 @@
             <classpath>
                 <pathelement path="${compile.core.dir}" />
                 <path refid="jspc.dependencies" />
+            </classpath>
+        </javac>
+
+        <!-- Jar the compile jsp's -->
+        <jar basedir="${jspc.classes.dest.dir}" jarfile="${jspc.dest.dir}/WEB-INF/lib/plugin-webclient-jspc.jar" />
+
+    </target>
+
+    <!-- -jspc-no-openfire-impl ======================================================================= -->
+    <target name="-jspc-impl-no-openfire" unless="no.jspc">
+
+        <!-- Have to use Tomcat 5's JspC task, not the default Ant one -->
+        <taskdef classname="org.apache.jasper.JspC" name="jasper2" >
+            <classpath id="jspc.classpath">
+                <pathelement location="${java.home}/../lib/tools.jar" />
+                <pathelement path="${compile.core.dir}" />
+                <path refid="jspc.no-openfire.dependencies" />
+            </classpath>
+        </taskdef>
+
+        <!-- JSP to JAVA -->
+        <jasper2 validateXml="false"
+                 uriroot="${src.webapp.dir}"
+                 outputDir="${jspc.java.dest.dir}"
+                 package="org.jivesoftware.webclient.jsp"
+                 webXml="${jspc.dest.dir}/WEB-INF/web.xml.generated" />
+
+        <!-- Compile java source -->
+        <javac destdir="${jspc.classes.dest.dir}"
+               includeAntRuntime="no"
+               debug="on"
+               source="1.7"
+               target="1.7"
+               executable="/software/java32/jdk1.7.0_13/bin/javac"
+               includes="org/jivesoftware/webclient/jsp/**/*.java">
+
+            <src path="${jspc.java.dest.dir}" />
+            <classpath>
+                <pathelement path="${compile.core.dir}" />
+                <path refid="jspc.no-openfire.dependencies" />
             </classpath>
         </javac>
 
