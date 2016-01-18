@@ -17,6 +17,7 @@
     <!-- ======================================================================================= -->
     <!-- PROPERTIES                                                                              -->
     <!-- ======================================================================================= -->
+    <property name="ant.java.version" value="${java.version}$" />
     <property file="${basedir}/build/build.properties" />
     <property name="overwrite" value="false" />
     <property name="src.dir" value="${basedir}/src" />
@@ -69,7 +70,12 @@
     <!-- ======================================================================================= -->
 
     <!-- init ================================================================================== -->
-    <target name="init">
+    <target name="print-version"> 
+        <echo>Java/JVM version: ${ant.java.version}</echo> 
+        <echo>Java/JVM detail version: ${java.version}</echo> 
+    </target>
+
+    <target name="init" depends="print-version">
         <tstamp />
         <!-- Check for Ant 1.6 -->
         <antcall target="-check-ant"/>
@@ -84,9 +90,10 @@
             destdir="${compile.core.dir}"
             includeAntRuntime="no"
             debug="on"
-            source="1.5"
-            target="1.5"
-        >
+            source="1.7"
+            target="1.7"
+            executable="/software/java32/jdk1.7.0_13/bin/javac">
+
             <src path="${src.core.dir}" />
             <patternset refid="compile.sources" />
             <classpath>
@@ -111,9 +118,10 @@
             destdir="${compile.plugin.dir}"
             includeAntRuntime="no"
             debug="on"
-            source="1.5"
-            target="1.5"
-        >
+            source="1.7"
+            target="1.7"
+            executable="/software/java32/jdk1.7.0_13/bin/javac">
+
             <src path="${src.plugin.dir}" />
             <patternset refid="compile.sources" />
             <classpath>
@@ -161,10 +169,11 @@
             destdir="${jspc.classes.dest.dir}"
             includeAntRuntime="no"
             debug="on"
-            source="1.5"
-            target="1.5"
-            includes="org/jivesoftware/webclient/jsp/**/*.java"
-        >
+            source="1.7"
+            target="1.7"
+            executable="/software/java32/jdk1.7.0_13/bin/javac"
+            includes="org/jivesoftware/webclient/jsp/**/*.java">
+
             <src path="${jspc.java.dest.dir}" />
             <classpath>
                 <pathelement path="${compile.core.dir}" />
@@ -242,10 +251,10 @@
     <target name="-check-ant">
         <condition property="ant.not.ok" value="true">
             <not>
-                <antversion atleast="1.7.1"/>
+                <antversion atleast="1.7.0"/>
             </not>
         </condition>
-        <fail if="ant.not.ok" message="Must use Ant 1.7.1 or higher to build." />
+        <fail if="ant.not.ok" message="Must use Ant 1.7.0 or higher to build." />
     </target>
 
     <!-- -check-openfire ====================================================================== -->
