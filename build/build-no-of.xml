@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="Web Client" default="plugin" basedir="..">
-
     <description>
         Build script for the Fastpath web chat client that does not require Openfire to be present.
     </description>
@@ -80,11 +79,7 @@
 
     <target name="init" depends="print-version">
         <tstamp />
-    </target>
-
-    <!-- init-no-openfire ====================================================================== -->
-    <target name="init-no-openfire">
-        <tstamp />
+        <antcall target="-check-java"/>
     </target>
 
     <!-- compile =============================================================================== -->
@@ -241,6 +236,20 @@
     <!-- clean ================================================================================= -->
     <target name="clean" description="Deletes build output">
         <delete dir="${target.dir}" />
+    </target>
+
+    <!-- -check-ant ============================================================================ -->
+    <target name="-check-java">
+        <condition property="java.not.ok" value="true">
+            <not>
+                <or>
+                    <contains string="${ant.java.version}" substring="1.7"/>
+                    <contains string="${ant.java.version}" substring="1.8"/>
+                    <contains string="${ant.java.version}" substring="1.9"/>
+                </or>
+            </not>
+        </condition>
+        <fail if="java.not.ok" message="Must use JDK 1.7 or higher to build Openfire. Your JDK is ${ant.java.version}"/>
     </target>
 
 </project>
