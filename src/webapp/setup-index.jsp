@@ -10,11 +10,17 @@
   - agreement with Jive.
 --%>
 
+<%@page import="javax.net.SocketFactory"%>
+<%@page import="org.jivesoftware.smack.ConnectionConfiguration.SecurityMode"%>
+<%@page import="org.jivesoftware.smack.packet.StreamError.Condition"%>
+<%@page import="org.jivesoftware.smack.XMPPException.XMPPErrorException"%>
+<%@page import="org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration"%>
+<%@page import="org.jivesoftware.smack.tcp.XMPPTCPConnection"%>
 <%@ page import="org.jivesoftware.webchat.util.ParamUtils,
                  java.util.Map,
                  java.util.HashMap,
                  java.net.InetAddress,
-                 org.jivesoftware.smack.XMPPConnection"%>
+                 org.jivesoftware.smack.packet.XMPPError"%>
  <%@ page import="java.util.Iterator" %>
  <%@ page import="org.jivesoftware.smack.ConnectionConfiguration" %>
  <%@ page import="org.jivesoftware.smack.XMPPException" %>
@@ -37,14 +43,19 @@
         }
 
         try {
-            ConnectionConfiguration xmppConfig = new ConnectionConfiguration(domain, port);
-            XMPPConnection con = new XMPPConnection(xmppConfig);
+            XMPPTCPConnectionConfiguration.Builder xmppConfig =  XMPPTCPConnectionConfiguration.builder()
+            		.setSecurityMode(XMPPTCPConnectionConfiguration.SecurityMode.disabled)
+            		.setCompressionEnabled(true)
+            		.setServiceName(domain)
+            		.setHost(domain)
+            		.setPort(port);
+            XMPPTCPConnection con = new XMPPTCPConnection(xmppConfig.build());
             con.connect();
             con.loginAnonymously();
         }
-        catch (XMPPException xe) {
+        catch (XMPPErrorException xe) {
             // If anonymous login disabled.
-            if (xe.getXMPPError().getCode() == 403) {
+            if (xe.getXMPPError().getCondition() == XMPPError.Condition.forbidden) {
                 errors.put("connect", "Anonymous login test failed. Ensure that anonymous logins are enabled on the server.");
             }
             else {

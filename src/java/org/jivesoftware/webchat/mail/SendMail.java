@@ -55,7 +55,7 @@ public class SendMail extends WebBean {
         try {
             // Set settings for this session
             XMPPConnection con = chatManager.getGlobalConnection();
-            Map map = Settings.getSettings(con, workgroup, Settings.EMAIL_SETTINGS);
+            Map<String , String> map = Settings.getSettings(con, workgroup, Settings.EMAIL_SETTINGS);
             String host = (String)map.get("host");
             String port = (String)map.get("port");
             String password = (String)map.get("password");

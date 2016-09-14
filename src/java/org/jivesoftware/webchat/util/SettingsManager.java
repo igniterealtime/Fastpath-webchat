@@ -18,8 +18,11 @@ import org.jivesoftware.smackx.workgroup.user.Workgroup;
 import org.jivesoftware.webchat.ChatManager;
 import org.jivesoftware.webchat.actions.WorkgroupChangeListener;
 import org.jivesoftware.webchat.actions.WorkgroupStatus;
+
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.provider.ProviderManager;
 
 import java.io.IOException;
 import java.net.URL;
@@ -35,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
  * Responsible for retrieving and writing out images belong to a workgroup.
  */
 public class SettingsManager implements WorkgroupChangeListener {
+	
     private static final String CONTENT_TYPE = "image/jpeg";
     private ChatManager chatManager = ChatManager.getInstance();
 
@@ -42,7 +46,7 @@ public class SettingsManager implements WorkgroupChangeListener {
      * Stores the ChatSettings of each workgroup, and will be updated
      * when packet date of workgroup changes.
      */
-    private Map chatSettings = new HashMap();
+    private Map<String , ChatSettings> chatSettings = new HashMap<String , ChatSettings>();
 
 
     private static SettingsManager singleton;
@@ -110,7 +114,11 @@ public class SettingsManager implements WorkgroupChangeListener {
             }
             catch (XMPPException e) {
                 WebLog.logError("Error retrieving chat setting using key=" + key + " and workgroup=" + workgroupName, e);
-            }
+            } catch (SmackException e) {
+				// TODO Auto-generated catch block
+            	WebLog.logError("Smack error",e);
+				e.printStackTrace();
+			}
         }
         if (settings != null) {
             return settings.getChatSetting(key);
@@ -142,9 +150,11 @@ public class SettingsManager implements WorkgroupChangeListener {
 
         // Otherwise, retrieve images from private data, store and send.
         XMPPConnection connection = chatManager.getGlobalConnection();
+        ProviderManager.addIQProvider(ChatSettings.ELEMENT_NAME, ChatSettings.NAMESPACE, new ChatSettings.InternalProvider());
         try {
             Workgroup workgroup = new Workgroup(workgroupName, connection);
             ChatSettings chatSettings = workgroup.getChatSettings();
+            WebLog.log("ChatSettings: "+chatSettings.toXML().toString());
             this.chatSettings.put(workgroupName, chatSettings);
             byte[] imageBytes = getImageFromMap(imageName, workgroupName);
             if (imageBytes == null) {

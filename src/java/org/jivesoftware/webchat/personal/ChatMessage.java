@@ -12,11 +12,13 @@ package org.jivesoftware.webchat.personal;
 
 import org.jivesoftware.webchat.util.FormText;
 import org.jivesoftware.webchat.util.ModelUtil;
+import org.jivesoftware.webchat.util.WebLog;
 import org.jivesoftware.webchat.util.WebUtils;
+import org.jxmpp.util.XmppStringUtils;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smackx.jiveproperties.JivePropertiesManager;
 
 /* RCSFile: $
  * Revision: $
@@ -31,28 +33,28 @@ import org.jivesoftware.smack.util.StringUtils;
 public class ChatMessage {
     private String from;
     private String body;
-    private Packet packet;
+    private Stanza packet;
     private String urlToPush;
     private String date;
 
-    public ChatMessage(Packet packet) {
+    public ChatMessage(Stanza packet) {
         if (packet instanceof Presence) {
             Presence presence = (Presence)packet;
             from = "";
 
-            String usersNickname = StringUtils.parseResource(presence.getFrom());
+            String usersNickname = XmppStringUtils.parseResource(presence.getFrom());
             body = usersNickname + " has joined the conversation.";
         }
         else if (packet instanceof Message) {
             Message message = (Message)packet;
-            if (message.getProperty("PUSH_URL") != null) {
-                urlToPush = (String)message.getProperty("PUSH_URL");
+            if (JivePropertiesManager.getProperty(message, "PUSH_URL") != null) {
+                urlToPush = (String)JivePropertiesManager.getProperty(message, "PUSH_URL");
                 urlToPush = WebUtils.getPushedURL(urlToPush);
             }
-            else if (message.getProperty("transfer") != null) {
+            else if (JivePropertiesManager.getProperty(message, "transfer")!= null) {
                 from = "";
-                boolean transfer = ((Boolean)message.getProperty("transfer")).booleanValue();
-                String workgroup = (String)message.getProperty("workgroup");
+                boolean transfer = ((Boolean)JivePropertiesManager.getProperty(message, "transfer")).booleanValue();
+                String workgroup = (String)JivePropertiesManager.getProperty(message, "workgroup");
                 if (transfer) {
                     body = FormText.getTransferToAgentText(workgroup);
                 }
@@ -61,7 +63,7 @@ public class ChatMessage {
                 }
             }
             else {
-                String from = StringUtils.parseResource(message.getFrom());
+                String from = XmppStringUtils.parseResource(message.getFrom());
                 setFrom(from);
                 setBody("");
             }
@@ -87,11 +89,11 @@ public class ChatMessage {
         this.body = body;
     }
 
-    public Packet getPacket() {
+    public Stanza getPacket() {
         return packet;
     }
 
-    public void setPacket(Packet packet) {
+    public void setPacket(Stanza packet) {
         this.packet = packet;
     }
 

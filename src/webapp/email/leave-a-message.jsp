@@ -1,4 +1,4 @@
-<%@ page import = "org.jivesoftware.smack.XMPPConnection,
+<%@ page import = "org.jivesoftware.smack.tcp.XMPPTCPConnection,
                    org.jivesoftware.webchat.ChatManager,
                    org.jivesoftware.webchat.util.ModelUtil,
                    org.jivesoftware.webchat.util.ParamUtils,
@@ -36,7 +36,7 @@
         workgroup = (String)session.getAttribute("workgroup");
     }
 
-    XMPPConnection con = chatManager.getGlobalConnection();
+    XMPPTCPConnection con = chatManager.getGlobalConnection();
 
     WorkgroupExt offlineWorkgroup = new WorkgroupExt(workgroup, con);
     boolean isEmailConfigured = offlineWorkgroup.isEmailAvailable();
@@ -126,7 +126,7 @@
         }
     }
 
-    String sendValue = StringUtils.escapeForXML(buf.toString());
+    String sendValue = StringUtils.escapeForXML(buf.toString()).toString();
 
 %>
 

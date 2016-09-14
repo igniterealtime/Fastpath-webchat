@@ -12,6 +12,8 @@
 
 package org.jivesoftware.webchat.actions;
 
+import org.jivesoftware.smackx.workgroup.packet.QueueUpdate;
+import org.jivesoftware.smackx.workgroup.packet.SessionID;
 import org.jivesoftware.smackx.workgroup.settings.WorkgroupProperties;
 import org.jivesoftware.smackx.workgroup.user.Workgroup;
 import org.jivesoftware.webchat.ChatManager;
@@ -22,7 +24,10 @@ import org.jivesoftware.webchat.settings.ConnectionSettings;
 import org.jivesoftware.webchat.util.ModelUtil;
 import org.jivesoftware.webchat.util.StringUtils;
 import org.jivesoftware.webchat.util.WebLog;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.provider.ProviderManager;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -53,6 +58,10 @@ public class ChatStarter extends WebBean {
      * Joins a queue with associated metadata.
      */
     public void startSession(String workgroup, String chatID) {
+
+        ProviderManager.addExtensionProvider(SessionID.ELEMENT_NAME, SessionID.NAMESPACE,new SessionID.Provider());
+        ProviderManager.addExtensionProvider(QueueUpdate.ELEMENT_NAME, QueueUpdate.NAMESPACE,new QueueUpdate.Provider());
+        
         ChatSession chatSession = chatManager.getChatSession(chatID);
 
         // If the user already has a session, close it down.
@@ -188,11 +197,19 @@ public class ChatStarter extends WebBean {
             // load workgroup properties and check of authentication is required for this workgroup
             Workgroup wGroup = new Workgroup(workgroup, chatManager.getGlobalConnection());
             WorkgroupProperties properties = null;
+            ProviderManager.addIQProvider(WorkgroupProperties.ELEMENT_NAME, WorkgroupProperties.NAMESPACE,new WorkgroupProperties.InternalProvider());
             try {
                 properties = wGroup.getWorkgroupProperties();
             }
             catch (XMPPException e) {
-            }
+            
+            } catch (NoResponseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NotConnectedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
             if (properties != null && properties.isAuthRequired()) {
                 // authentication is required, all users must login

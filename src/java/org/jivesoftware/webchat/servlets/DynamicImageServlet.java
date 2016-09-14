@@ -12,13 +12,7 @@
 
 package org.jivesoftware.webchat.servlets;
 
-import org.jivesoftware.webchat.ChatManager;
-import org.jivesoftware.webchat.actions.WorkgroupStatus;
-import org.jivesoftware.webchat.util.SettingsManager;
-import org.jivesoftware.webchat.util.WebLog;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Presence;
+import java.io.IOException;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -26,7 +20,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.SmackException.NotLoggedInException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.roster.Roster;
+import org.jivesoftware.webchat.ChatManager;
+import org.jivesoftware.webchat.actions.WorkgroupStatus;
+import org.jivesoftware.webchat.util.SettingsManager;
+import org.jivesoftware.webchat.util.WebLog;
 
 /**
  * Used to retrieve images from within an email account. This allows to bypass
@@ -34,7 +37,12 @@ import java.io.IOException;
  */
 public class DynamicImageServlet extends HttpServlet {
 
-    public void init(ServletConfig config) throws ServletException {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public void init(ServletConfig config) throws ServletException {
         super.init(config);
     }
 
@@ -63,7 +71,7 @@ public class DynamicImageServlet extends HttpServlet {
         boolean isOnline = WorkgroupStatus.isOnline(workgroup);
         final SettingsManager imageManager = SettingsManager.getInstance();
 
-        final Roster roster = chatManager.getGlobalConnection().getRoster();
+        final Roster roster =  Roster.getInstanceFor(chatManager.getGlobalConnection());
         final Presence presence = roster.getPresence(requestAgent);
 
         isOnline = isOnline && presence != null && presence.getType() == Presence.Type.available;
@@ -76,7 +84,16 @@ public class DynamicImageServlet extends HttpServlet {
                 }
                 catch (XMPPException e) {
                    WebLog.logError("Error creating new roster entry:", e);
-                }
+                } catch (NotLoggedInException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NoResponseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NotConnectedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             }
         }
 

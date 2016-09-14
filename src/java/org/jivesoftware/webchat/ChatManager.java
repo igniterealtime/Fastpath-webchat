@@ -12,15 +12,17 @@
 
 package org.jivesoftware.webchat;
 
-import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.webchat.actions.WorkgroupStatus;
 import org.jivesoftware.webchat.settings.ChatSettingsManager;
 import org.jivesoftware.webchat.settings.ConnectionSettings;
-import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
 import org.jivesoftware.webchat.util.WebLog;
 
 import java.util.ArrayList;
@@ -42,7 +44,7 @@ import javax.servlet.ServletContext;
  */
 public final class ChatManager {
     private Map<String, ChatSession> sessions;
-    private XMPPConnection globalConnection;
+    private XMPPTCPConnection globalConnection;
     private ChatSettingsManager chatSettingsManager;
 
     /**
@@ -137,7 +139,7 @@ public final class ChatManager {
                                 chat.sendMessage(chatMessage);
 
                                 chatSession.setInactivityWarningSent(true);
-                            } catch (XMPPException e) {
+                            } catch (NotConnectedException e) {
                                 WebLog.logError("Error sending message:", e);
                             }
                         }
@@ -236,7 +238,7 @@ public final class ChatManager {
      *
      * @param con the <code>XMPPConnection</code> for the Web Client Service.
      */
-    public void setGlobalConnection(XMPPConnection con) {
+    public void setGlobalConnection(XMPPTCPConnection con) {
         globalConnection = con;
 
         WorkgroupStatus.initStatusListener();
@@ -247,7 +249,7 @@ public final class ChatManager {
      *
      * @return the <code>XMPPConnection</code> for the Web Client Service.
      */
-    public XMPPConnection getGlobalConnection() {
+    public XMPPTCPConnection getGlobalConnection() {
         return globalConnection;
     }
 
@@ -277,7 +279,7 @@ public final class ChatManager {
      * Connection Handling.
      */
     public synchronized XMPPConnection createConnection(final ServletContext context) {
-        XMPPConnection xmppConn = null;
+        XMPPTCPConnection xmppConn = null;
 
         ConnectionSettings settings = chatSettingsManager.getSettings();
         if (settings == null) {
@@ -294,13 +296,14 @@ public final class ChatManager {
         // Initialize the XMPP connection
         try {
 
-            if (port == -1) {
-                xmppConn = new XMPPConnection(host);
-            }
-            else {
-                ConnectionConfiguration config = new ConnectionConfiguration(host, port);
-                xmppConn = new XMPPConnection(config);
-            }
+            XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder()
+            		.setSecurityMode(XMPPTCPConnectionConfiguration.SecurityMode.disabled)
+            		.setServiceName(host)
+            		.setHost(host)
+            		.setPort(port);
+            
+            xmppConn = new XMPPTCPConnection(config.build());
+            
             xmppConn.connect();
 
             // Login the presence bot user
@@ -331,6 +334,18 @@ public final class ChatManager {
                 public void reconnectionFailed(Exception exception) {
 
                 }
+
+				@Override
+				public void connected(XMPPConnection connection) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void authenticated(XMPPConnection connection, boolean resumed) {
+					// TODO Auto-generated method stub
+					
+				}
             });
         }
         catch (Exception e) {

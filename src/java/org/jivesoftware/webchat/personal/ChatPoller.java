@@ -11,13 +11,15 @@
 package org.jivesoftware.webchat.personal;
 
 import org.jivesoftware.webchat.util.ModelUtil;
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
+import org.jivesoftware.webchat.util.StringUtils;
+import org.jxmpp.util.XmppStringUtils;
+import org.jivesoftware.smack.chat.Chat;
+import org.jivesoftware.smack.filter.StanzaTypeFilter;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,19 +36,22 @@ import java.util.List;
  */
 
 public class ChatPoller {
-    private List messageList;
+    private List<ChatMessage> messageList;
     private Chat chat;
 
     public ChatPoller() {
-        messageList = Collections.synchronizedList(new ArrayList());
+        messageList = Collections.synchronizedList(new ArrayList<ChatMessage>());
     }
 
-    public void listenForMessages(final XMPPConnection con, Chat chat) {
+    public void listenForMessages(final XMPPTCPConnection con, Chat chat) {
         this.chat = chat;
 
-        PacketListener packetListener = new PacketListener() {
-            public void processPacket(Packet packet) {
-                Message message = (Message) packet;
+        StanzaListener packetListener = new StanzaListener() {
+			
+			@Override
+			public void processPacket(Stanza packet) throws NotConnectedException {
+				// TODO Auto-generated method stub
+				Message message = (Message) packet;
                 if (ModelUtil.hasLength(message.getBody())) {
                     ChatMessage chatMessage = new ChatMessage(message);
                     String from = StringUtils.parseName(message.getFrom());
@@ -60,10 +65,9 @@ public class ChatPoller {
                     chatMessage.setBody(body);
                     messageList.add(chatMessage);
                 }
-            }
-        };
-
-        con.addPacketListener(packetListener, new PacketTypeFilter(Message.class));
+			}
+		};
+        con.addAsyncStanzaListener(packetListener, new StanzaTypeFilter(Message.class));
     }
 
     public ChatMessage getNextMessage() {

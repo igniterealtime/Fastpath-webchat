@@ -15,6 +15,7 @@ package org.jivesoftware.webchat.util;
 import org.jivesoftware.webchat.filter.EmoticonFilter;
 import org.jivesoftware.webchat.filter.TextStyleFilter;
 import org.jivesoftware.webchat.filter.URLFilter;
+import org.jxmpp.util.XmppStringUtils;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 
@@ -180,8 +181,7 @@ public final class WebUtils {
      * @return the nickname of the user who sent the message.
      */
     public static String getNickname(Message message) {
-        String from = org.jivesoftware.smack.util.StringUtils.parseResource(message.getFrom());
-        return from;
+        return XmppStringUtils.parseResource(message.getFrom());
     }
 
     /**

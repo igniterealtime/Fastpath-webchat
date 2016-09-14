@@ -10,16 +10,14 @@
 
 package org.jivesoftware.webchat;
 
-import org.jivesoftware.webchat.actions.WorkgroupStatus;
-import org.jivesoftware.webchat.settings.ChatSettingsManager;
-import org.jivesoftware.webchat.util.ModelUtil;
-import org.jivesoftware.webchat.util.SettingsManager;
-import org.jivesoftware.webchat.util.URLFileSystem;
-import org.jivesoftware.webchat.util.WebLog;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.packet.Presence;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -29,14 +27,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.Timer;
-import java.util.TimerTask;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.SmackException.NotLoggedInException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.roster.Roster;
+import org.jivesoftware.webchat.actions.WorkgroupStatus;
+import org.jivesoftware.webchat.settings.ChatSettingsManager;
+import org.jivesoftware.webchat.util.ModelUtil;
+import org.jivesoftware.webchat.util.SettingsManager;
+import org.jivesoftware.webchat.util.URLFileSystem;
+import org.jivesoftware.webchat.util.WebLog;
 
 /**
  * Live Assistant servlet.
@@ -184,7 +187,7 @@ public class FastpathServlet extends HttpServlet {
             boolean isOnline = WorkgroupStatus.isOnline(workgroup);
 
 
-            final Roster roster = chatManager.getGlobalConnection().getRoster();
+            final Roster roster = Roster.getInstanceFor(chatManager.getGlobalConnection());
             final Presence presence = roster.getPresence(requestAgent);
 
             if (isOnline && presence != null && presence.getType() == Presence.Type.available) {
@@ -211,7 +214,7 @@ public class FastpathServlet extends HttpServlet {
             String workgroup = request.getParameter("workgroup");
             boolean isOnline = WorkgroupStatus.isOnline(workgroup);
 
-            final Roster roster = chatManager.getGlobalConnection().getRoster();
+            final Roster roster = Roster.getInstanceFor(chatManager.getGlobalConnection());
             final Presence presence = roster.getPresence(requestAgent);
 
             if (isOnline && presence != null && presence.getType() == Presence.Type.available) {
@@ -229,7 +232,16 @@ public class FastpathServlet extends HttpServlet {
                     }
                     catch (XMPPException e) {
                         WebLog.logError("Error checking roster", e);
-                    }
+                    } catch (NotLoggedInException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (NoResponseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (NotConnectedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
                 }
             }
 
@@ -294,11 +306,11 @@ public class FastpathServlet extends HttpServlet {
     /**
      * convenience method, used ultimately in constructing packet filters.
      */
-    protected String getPacketIDRoot(Packet p) {
+    protected String getPacketIDRoot(Stanza p) {
         if (p == null) {
             return null;
         }
-        return p.getPacketID().substring(0, 5);
+        return p.getStanzaId().substring(0, 5);
     }
 
     // Utility methods //

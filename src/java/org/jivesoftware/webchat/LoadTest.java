@@ -9,6 +9,7 @@ import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.muc.InvitationListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import javax.swing.JFrame;
@@ -35,7 +36,11 @@ public class LoadTest {
                 while (iter.hasNext()) {
                     ChatSession session = (ChatSession)iter.next();
                     if (session.isInGroupChat()) {
-                        session.getGroupChat().sendMessage("Howdy");
+                    	if (session.getGroupChat() != null){
+                    		MultiUserChat chat = session.getGroupChat();
+                    		chat.sendMessage("Howdy");
+                    	}
+                        
                     }
                     //session.close();
                 }
@@ -90,78 +95,90 @@ public class LoadTest {
     }
 
     private void connectAsAgent() {
-        try {
-            final XMPPConnection con = new XMPPConnection(SERVER);
-            con.login("jive", "user", "demo");
-
-            // Notify workgroup that the agent is here
-            AgentSession agentSession = new AgentSession("demo@workgroup."+SERVER, con);
-            agentSession.setOnline(true);
-            agentSession.setStatus(Presence.Mode.available, 10, "available");
-
-
-            con.addConnectionListener(new ConnectionListener() {
-                public void connectionClosed() {
-                    System.out.println("Connection is closed");
-                }
-
-                public void connectionClosedOnError(Exception e) {
-                    System.out.println("Connection closed with an error: " + e);
-                }
-
-
-                public void reconnectingIn(int i) {
-                }
-
-                public void reconnectionSuccessful() {
-                }
-
-                public void reconnectionFailed(Exception exception) {
-                }
-            });
-
-            // Add Offer Listener
-            agentSession.addOfferListener(new OfferListener() {
-                public void offerReceived(Offer offer) {
-                    offer.accept();
-                    System.out.println("offer accepted " + offer.getSessionID());
-                }
-
-                public void offerRevoked(RevokedOffer revokedOffer) {
-                    System.out.println("Offer was revoked: " + revokedOffer.getReason());
-                }
-            });
-
-            // Listen for Room Invitation from Server
-            MultiUserChat.addInvitationListener(con, new InvitationListener() {
-                public void invitationReceived(XMPPConnection conn, String room, String inviter, String reason, String password, Message message) {
-
-                    Map metaData = new HashMap();
-                    MetaData metaDataExt = (MetaData)message.getExtension(MetaData.ELEMENT_NAME, MetaData.NAMESPACE);
-                    if (metaDataExt != null) {
-                        metaData = metaDataExt.getMetaData();
-                    }
-                    System.out.println("Creating room for sessionID " + reason);
-                    metaData.put("inviter", inviter);
-
-                    MultiUserChat groupChat = new MultiUserChat(con, room);
-                    groupChat.addMessageListener(new PacketListener() {
-                        public void processPacket(Packet packet) {
-                            System.out.println(((Message)packet).getBody());
-                        }
-                    });
-                }
-
-                @Override
-                public void invitationReceived(Connection conn, String room, String inviter, String reason, String password, Message message) {
-                    throw new UnsupportedOperationException();
-                }
-            });
-
-        }
-        catch (XMPPException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            final XMPPTCPConnection con = new XMPPTCPConnection(SERVER);
+//            con.login("jive", "user", "demo");
+//
+//            // Notify workgroup that the agent is here
+//            AgentSession agentSession = new AgentSession("demo@workgroup."+SERVER, con);
+//            agentSession.setOnline(true);
+//            agentSession.setStatus(Presence.Mode.available, 10, "available");
+//
+//
+//            con.addConnectionListener(new ConnectionListener() {
+//                public void connectionClosed() {
+//                    System.out.println("Connection is closed");
+//                }
+//
+//                public void connectionClosedOnError(Exception e) {
+//                    System.out.println("Connection closed with an error: " + e);
+//                }
+//
+//
+//                public void reconnectingIn(int i) {
+//                }
+//
+//                public void reconnectionSuccessful() {
+//                }
+//
+//                public void reconnectionFailed(Exception exception) {
+//                }
+//
+//				@Override
+//				public void connected(XMPPConnection connection) {
+//					// TODO Auto-generated method stub
+//					
+//				}
+//
+//				@Override
+//				public void authenticated(XMPPConnection connection, boolean resumed) {
+//					// TODO Auto-generated method stub
+//					
+//				}
+//            });
+//
+//            // Add Offer Listener
+//            agentSession.addOfferListener(new OfferListener() {
+//                public void offerReceived(Offer offer) {
+//                    offer.accept();
+//                    System.out.println("offer accepted " + offer.getSessionID());
+//                }
+//
+//                public void offerRevoked(RevokedOffer revokedOffer) {
+//                    System.out.println("Offer was revoked: " + revokedOffer.getReason());
+//                }
+//            });
+//
+//            // Listen for Room Invitation from Server
+//            MultiUserChat.addInvitationListener(con, new InvitationListener() {
+//                public void invitationReceived(XMPPConnection conn, String room, String inviter, String reason, String password, Message message) {
+//
+//                    Map metaData = new HashMap();
+//                    MetaData metaDataExt = (MetaData)message.getExtension(MetaData.ELEMENT_NAME, MetaData.NAMESPACE);
+//                    if (metaDataExt != null) {
+//                        metaData = metaDataExt.getMetaData();
+//                    }
+//                    System.out.println("Creating room for sessionID " + reason);
+//                    metaData.put("inviter", inviter);
+//
+//                    MultiUserChat groupChat = new MultiUserChat(con, room);
+//                    groupChat.addMessageListener(new PacketListener() {
+//                        public void processPacket(Packet packet) {
+//                            System.out.println(((Message)packet).getBody());
+//                        }
+//                    });
+//                }
+//
+//                @Override
+//                public void invitationReceived(Connection conn, String room, String inviter, String reason, String password, Message message) {
+//                    throw new UnsupportedOperationException();
+//                }
+//            });
+//
+//        }
+//        catch (XMPPException e) {
+//            e.printStackTrace();
+//        }
     }
 
 }

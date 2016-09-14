@@ -26,7 +26,11 @@ import java.io.IOException;
  * a particular workgroup.
  */
 public class ImageServlet extends HttpServlet {
-    private final String IMAGE = "image";
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private final String IMAGE = "image";
     private final String WORKGROUP = "workgroup";
 
     public void init(ServletConfig config) throws ServletException {

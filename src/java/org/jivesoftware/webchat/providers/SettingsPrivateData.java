@@ -12,9 +12,10 @@
 
 package org.jivesoftware.webchat.providers;
 
-import org.jivesoftware.smackx.packet.PrivateData;
 
 import java.util.Map;
+
+import org.jivesoftware.smackx.iqprivate.packet.PrivateData;
 
 /**
  * Represents the private data for the Workgroup Settings.
@@ -22,14 +23,14 @@ import java.util.Map;
 public class SettingsPrivateData implements PrivateData {
     private String elementName;
     private String namespace;
-    private Map settingsMap;
+    private Map<String , String> settingsMap;
 
     /**
      * Paramter constructor to create the PrivateData to use.
      * @param workgroup the name of the workgroup this private data belongs to.
      * @param map the private data settings.
      */
-    public SettingsPrivateData(String workgroup, Map map) {
+    public SettingsPrivateData(String workgroup, Map<String , String> map) {
         super();
         namespace = "workgroup:" + workgroup + ":settings:email";
         elementName = "workgroup_settings";
@@ -40,7 +41,7 @@ public class SettingsPrivateData implements PrivateData {
      * Returns the private data settings.
      * @return the settings.
      */
-    public Map getMap() {
+    public Map<String , String> getMap() {
         return settingsMap;
     }
 

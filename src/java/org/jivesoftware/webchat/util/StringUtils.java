@@ -745,7 +745,7 @@ public class StringUtils {
             return new String[0];
         }
 
-        ArrayList wordList = new ArrayList();
+        ArrayList<String> wordList = new ArrayList<String>();
         BreakIterator boundary = BreakIterator.getWordInstance();
         boundary.setText(text);
         int start = 0;
@@ -1274,6 +1274,27 @@ public class StringUtils {
 
         // all tests passed
         return true;
+    }
+    
+    /**
+     * Returns the name portion of a XMPP address. For example, for the
+     * address "matt@jivesoftware.com/Smack", "matt" would be returned. If no
+     * username is present in the address, the empty string will be returned.
+     *
+     * @param XMPPAddress the XMPP address.
+     * @return the name portion of the XMPP address.
+     */
+    public static String parseName(String XMPPAddress) {
+        if (XMPPAddress == null) {
+            return null;
+        }
+        int atIndex = XMPPAddress.lastIndexOf("@");
+        if (atIndex <= 0) {
+            return "";
+        }
+        else {
+            return XMPPAddress.substring(0, atIndex);
+        }
     }
 
     // Testing method

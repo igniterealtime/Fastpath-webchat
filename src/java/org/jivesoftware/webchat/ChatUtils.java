@@ -15,15 +15,16 @@ import org.jivesoftware.smackx.workgroup.user.Workgroup;
 import org.jivesoftware.webchat.actions.ChatQueue;
 import org.jivesoftware.webchat.personal.ChatMessage;
 import org.jivesoftware.webchat.util.FormText;
-import org.jivesoftware.webchat.util.WebLog;
 import org.jivesoftware.webchat.util.WebUtils;
+import org.jxmpp.util.XmppStringUtils;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.util.StringUtils;
-import org.jivesoftware.smackx.MessageEventManager;
+import org.jivesoftware.smackx.xevent.MessageEventManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -60,7 +61,7 @@ public class ChatUtils {
      * @param chatID  the chat id.
      * @param message the message to send.
      */
-    public static void sendMessage(String chatID, String message) {
+    public static void sendMessage(String chatID, String message) throws XMPPException {
         ChatSession chatSession = getChatSession(chatID);
 
         // If the user doesn't have a chat session, notify them.
@@ -98,10 +99,10 @@ public class ChatUtils {
                     chatMessage.setTo(room);
                     chat.sendMessage(chatMessage);
                 }
-            }
-            catch (XMPPException e) {
-                WebLog.logError("Error sending message:", e);
-            }
+            }catch (NotConnectedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
     }
 
@@ -132,7 +133,7 @@ public class ChatUtils {
         chatSession.clearNotificationReceived();
     }
 
-    public static void customerIsTyping(String chatID) {
+    public static void customerIsTyping(String chatID) throws NotConnectedException {
         ChatSession chatSession = getChatSession(chatID);
         if (chatSession == null) {
             return;
@@ -140,10 +141,9 @@ public class ChatUtils {
 
 
         final MultiUserChat chat = chatSession.getGroupChat();
-        final Iterator iter = chat.getOccupants();
-        while (iter.hasNext()) {
-            String from = (String)iter.next();
-            String tFrom = StringUtils.parseResource(from);
+        final List<String> occupants = chat.getOccupants();
+        for (String from : occupants){
+            String tFrom = XmppStringUtils.parseResource(from);
             String nickname = chat.getNickname();
             if (tFrom != null && !tFrom.equals(nickname)) {
                 MessageEventManager messageEventManager = chatSession.getMessageEventManager();
@@ -153,7 +153,7 @@ public class ChatUtils {
     }
 
 
-    public static ChatQueue getChatQueue(String chatID) {
+    public static ChatQueue getChatQueue(String chatID) throws NoResponseException, XMPPErrorException, NotConnectedException {
         ChatSession chatSession = getChatSession(chatID);
         if (chatSession == null) {
             return null;

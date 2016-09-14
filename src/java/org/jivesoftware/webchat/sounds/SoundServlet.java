@@ -12,6 +12,8 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import java.io.IOException;
 
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
 
 public class SoundServlet extends HttpServlet {
@@ -40,6 +42,14 @@ public class SoundServlet extends HttpServlet {
             }
         } catch (XMPPException e) {
             WebLog.log("Could not load sound settings for workgroup " + workgroupName);
-        }
+        } catch (NoResponseException e) {
+			// TODO Auto-generated catch block
+        	WebLog.logError("NoResponseException " , e);
+			e.printStackTrace();
+		} catch (NotConnectedException e) {
+			// TODO Auto-generated catch block
+			WebLog.logError("NotConnectedException " , e);
+			e.printStackTrace();
+		}
     }
 }

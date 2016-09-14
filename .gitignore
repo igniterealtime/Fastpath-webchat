@@ -8,6 +8,6 @@ target
 /bin/
 .project
 .classpath
-
+.settings
 #OS generated
 .DS_Store

@@ -10,16 +10,16 @@
   - agreement with Jive.
 --%>
 
+<%@page import="org.jivesoftware.webchat.util.StringUtils"%>
 <%@ page import="org.jivesoftware.webchat.util.ModelUtil,
                  org.jivesoftware.webchat.ChatManager,
                  org.jivesoftware.webchat.ChatSession,
-                 org.jivesoftware.smack.XMPPConnection,
+                 org.jivesoftware.smack.tcp.XMPPTCPConnection,
                  java.util.Map,
                  org.jivesoftware.webchat.providers.Settings,
                  org.jivesoftware.smackx.workgroup.user.WorkgroupExt,
                  org.jivesoftware.webchat.util.FormText,
-                 org.jivesoftware.webchat.util.ParamUtils,
-                 org.jivesoftware.smack.util.StringUtils" errorPage="fatal.jsp" %>
+                 org.jivesoftware.webchat.util.ParamUtils" errorPage="fatal.jsp" %>
 
 <%
     String workgroup = request.getParameter("workgroup");
@@ -35,7 +35,7 @@
     // Close Chat Session
     chatSession.close();
 
-    XMPPConnection con = chatManager.getGlobalConnection();
+    XMPPTCPConnection con = chatManager.getGlobalConnection();
     if(!con.isConnected()){
         response.sendRedirect("chat-ended.jsp");
         return;

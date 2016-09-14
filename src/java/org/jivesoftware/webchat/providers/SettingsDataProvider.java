@@ -12,13 +12,14 @@
 
 package org.jivesoftware.webchat.providers;
 
-import org.jivesoftware.smackx.packet.PrivateData;
-import org.jivesoftware.smackx.provider.PrivateDataProvider;
-import org.xmlpull.v1.XmlPullParser;
-
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jivesoftware.smackx.iqprivate.packet.PrivateData;
+import org.jivesoftware.smackx.iqprivate.provider.PrivateDataProvider;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 /**
  * Parses all generic metadata for workgroup settings.
@@ -37,8 +38,8 @@ public class SettingsDataProvider implements PrivateDataProvider {
      * @return the PrivateData.
      * @throws Exception
      */
-    public PrivateData parsePrivateData(XmlPullParser parser) throws Exception {
-        final Map map = new HashMap();
+    public PrivateData parsePrivateData(XmlPullParser parser) throws XmlPullParserException , IOException {
+        final Map<String , String> map = new HashMap<String , String>();
         String t = parser.getText();
 
         int eventType = parser.getEventType();

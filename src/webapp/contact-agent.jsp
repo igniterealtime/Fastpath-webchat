@@ -13,7 +13,7 @@
 <%@ page import="org.jivesoftware.webchat.util.ParamUtils,
                  org.jivesoftware.webchat.actions.WorkgroupStatus,
                  org.jivesoftware.smack.XMPPConnection,
-                 org.jivesoftware.smack.Roster,
+                 org.jivesoftware.smack.roster.Roster,
                  org.jivesoftware.smack.packet.Presence" errorPage="fatal.jsp" %>
 <html>
 <head>

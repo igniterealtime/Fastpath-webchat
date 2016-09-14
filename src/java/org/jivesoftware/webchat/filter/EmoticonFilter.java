@@ -46,7 +46,7 @@ import java.util.StringTokenizer;
  * </table>
  */
 public class EmoticonFilter {
-    private static final Map EMOTICON_MAP = new HashMap();
+    private static final Map<String , String > EMOTICON_MAP = new HashMap<String , String>();
 
     private EmoticonFilter() {
         // Not instantiable.

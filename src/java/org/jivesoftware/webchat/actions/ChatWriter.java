@@ -13,15 +13,14 @@
 package org.jivesoftware.webchat.actions;
 
 import org.jivesoftware.webchat.ChatSession;
-import org.jivesoftware.webchat.util.WebLog;
 import org.jivesoftware.webchat.util.WebUtils;
-import org.jivesoftware.smack.XMPPException;
+import org.jxmpp.util.XmppStringUtils;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.util.StringUtils;
-import org.jivesoftware.smackx.MessageEventManager;
+import org.jivesoftware.smackx.xevent.MessageEventManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * Responsible for sending messages to all parties in a ChatRoom. The
@@ -55,40 +54,41 @@ public final class ChatWriter {
 
         // If the message isn't specified, do nothing.
         if (message != null) {
-            try {
-                final MultiUserChat chat = chatSession.getGroupChat();
-                message = message.replaceAll("\r", " ");
+            final MultiUserChat chat = chatSession.getGroupChat();
+			message = message.replaceAll("\r", " ");
 
-                // update the transcript:
-                String body = WebUtils.applyFilters(message);
-                String nickname = chat.getNickname();
-                chatSession.updateTranscript(nickname, body);
+			// update the transcript:
+			String body = WebUtils.applyFilters(message);
+			String nickname = chat.getNickname();
+			chatSession.updateTranscript(nickname, body);
 
-                if (chat != null) {
-                    final Message chatMessage = new Message();
-                    chatMessage.setType(Message.Type.groupchat);
-                    chatMessage.setBody(message);
+			if (chat != null) {
+			    final Message chatMessage = new Message();
+			    chatMessage.setType(Message.Type.groupchat);
+			    chatMessage.setBody(message);
 
-                    String room = chat.getRoom();
-                    chatMessage.setTo(room);
-                    chat.sendMessage(chatMessage);
-                }
-            }
-            catch (XMPPException e) {
-                WebLog.logError("Error sending message:", e);
-            }
+			    String room = chat.getRoom();
+			    chatMessage.setTo(room);
+			    try {
+					chat.sendMessage(chatMessage);
+				} catch (NotConnectedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
         }
     }
 
     /**
      * Notifies all MessageEventHandlers that the customer is typing a message.
+     * @throws NotConnectedException 
      */
-    public void customerIsTyping() {
+    public void customerIsTyping() throws NotConnectedException {
         final MultiUserChat chat = chatSession.getGroupChat();
-        final Iterator iter = chat.getOccupants();
-        while (iter.hasNext()) {
-            String from = (String) iter.next();
-            String tFrom = StringUtils.parseResource(from);
+        final List<String> occupants = chat.getOccupants();
+        
+        for (String from : occupants){
+        	String tFrom = XmppStringUtils.parseResource(from);
             String nickname = chat.getNickname();
             if (tFrom != null && !tFrom.equals(nickname)) {
                 MessageEventManager messageEventManager = chatSession.getMessageEventManager();

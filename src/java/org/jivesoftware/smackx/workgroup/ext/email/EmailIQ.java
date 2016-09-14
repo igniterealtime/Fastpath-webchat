@@ -4,28 +4,20 @@ import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.util.StringUtils;
 
 public class EmailIQ extends IQ {
-    public static final String ELEMENT_NAME = "send-email";
+
+	public static final String ELEMENT_NAME = "send-email";
     public static final String NAMESPACE = "http://jivesoftware.com/protocol/workgroup";
+    
+    public EmailIQ() {
+		super(ELEMENT_NAME , NAMESPACE);
+	}
+    
     private String fromAddress;
     private String toAddress;
     private String subject;
     private String message;
     private boolean html;
     private String sessionID;
-    
-    public String getChildElementXML() {
-        StringBuilder localStringBuilder = new StringBuilder();
-        localStringBuilder.append("<").append("send-email").append(" xmlns=\"").append("http://jivesoftware.com/protocol/workgroup").append("\">");
-        localStringBuilder.append("<fromAddress>").append(StringUtils.escapeForXML(getFromAddress())).append("</fromAddress>");
-        localStringBuilder.append("<toAddress>").append(StringUtils.escapeForXML(getToAddress())).append("</toAddress>");
-        localStringBuilder.append("<subject>").append(StringUtils.escapeForXML(getSubject())).append("</subject>");
-        localStringBuilder.append("<message>").append(StringUtils.escapeForXML(getMessage())).append("</message>");
-        localStringBuilder.append("<useHTML>").append(Boolean.toString(isHtml())).append("</useHTML>");
-        if (getSessionID() != null)
-            localStringBuilder.append("<sessionID>").append(getSessionID()).append("</sessionID>");
-        localStringBuilder.append("</").append("send-email").append("> ");
-        return localStringBuilder.toString();
-    }
     
     public String getFromAddress() {
         return this.fromAddress;
@@ -74,4 +66,19 @@ public class EmailIQ extends IQ {
     public void setSessionID(String paramString) {
         this.sessionID = paramString;
     }
+
+	@Override
+	protected IQChildElementXmlStringBuilder getIQChildElementBuilder(IQChildElementXmlStringBuilder xml) {
+		// TODO Auto-generated method stub
+		xml.append("<").append("send-email").append(" xmlns=\"").append("http://jivesoftware.com/protocol/workgroup").append("\">");
+		xml.append("<fromAddress>").append(StringUtils.escapeForXML(getFromAddress())).append("</fromAddress>");
+		xml.append("<toAddress>").append(StringUtils.escapeForXML(getToAddress())).append("</toAddress>");
+		xml.append("<subject>").append(StringUtils.escapeForXML(getSubject())).append("</subject>");
+		xml.append("<message>").append(StringUtils.escapeForXML(getMessage())).append("</message>");
+		xml.append("<useHTML>").append(Boolean.toString(isHtml())).append("</useHTML>");
+        if (getSessionID() != null)
+        	xml.append("<sessionID>").append(getSessionID()).append("</sessionID>");
+        xml.append("</").append("send-email").append("> ");
+        return xml;
+	}
 }

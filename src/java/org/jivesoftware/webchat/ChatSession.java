@@ -20,27 +20,33 @@ import org.jivesoftware.webchat.history.Transcript;
 import org.jivesoftware.webchat.personal.ChatMessage;
 import org.jivesoftware.webchat.util.ModelUtil;
 import org.jivesoftware.webchat.util.WebLog;
-import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jxmpp.util.XmppStringUtils;
 import org.jivesoftware.smack.ConnectionListener;
-import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.PresenceListener;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.AndFilter;
-import org.jivesoftware.smack.filter.FromContainsFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
+import org.jivesoftware.smack.filter.FromMatchesFilter;
+import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.util.StringUtils;
-import org.jivesoftware.smackx.MessageEventManager;
-import org.jivesoftware.smackx.MessageEventNotificationListener;
+import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.xevent.MessageEventManager;
+import org.jivesoftware.smackx.xevent.MessageEventNotificationListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.smackx.packet.DelayInformation;
+import org.jivesoftware.smackx.muc.MultiUserChatManager;
+import org.jivesoftware.smackx.delay.packet.DelayInformation;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -52,8 +58,8 @@ import java.util.TimerTask;
  *
  * @author Derek DeMoro
  */
-public class ChatSession implements MessageEventNotificationListener, PacketListener {
-    private XMPPConnection connection;
+public class ChatSession implements MessageEventNotificationListener, StanzaListener {
+    private XMPPTCPConnection connection;
     private Workgroup workgroup;
     private MultiUserChat groupChat;
 
@@ -75,7 +81,7 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
 
     private String sessionID;
 
-    private List messageList = new ArrayList();
+    private List<ChatMessage> messageList = new ArrayList<ChatMessage>();
 
     /**
      * The time in milliseconds when the browser last checked for new messages.
@@ -123,16 +129,16 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
         this.userid = userid;
         
         this.createdTimestamp = System.currentTimeMillis();
+        
     }
 
     private boolean connect() throws Exception {
-        if (port == -1 || port == 5222) {
-            connection = new XMPPConnection(host);
-        }
-        else {
-            ConnectionConfiguration config = new ConnectionConfiguration(host, port);
-            connection = new XMPPConnection(config);
-        }
+        XMPPTCPConnectionConfiguration.Builder config =XMPPTCPConnectionConfiguration.builder()
+        		.setSecurityMode(XMPPTCPConnectionConfiguration.SecurityMode.disabled)
+        		.setServiceName(host)
+        		.setHost(host)
+        		.setPort(port);
+        connection = new XMPPTCPConnection(config.build());
 
         connection.connect();
 
@@ -170,6 +176,18 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
 
             public void reconnectionFailed(Exception exception) {
             }
+
+			@Override
+			public void connected(XMPPConnection connection) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void authenticated(XMPPConnection connection, boolean resumed) {
+				// TODO Auto-generated method stub
+				
+			}
         });
 
         return true;
@@ -255,7 +273,10 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
             }
             catch (XMPPException e) {
                 WebLog.logError("Unable to join chat queue.", e);
-            }
+            } catch (SmackException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
 
         // If metadata about the users name is present, use it to set the name.
@@ -354,11 +375,22 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
             }
             catch (XMPPException xe) {
                 WebLog.logError("Error closing ChatSession:", xe);
-            }
+            } catch (NoResponseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NotConnectedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
         // If we've already been routed and are in a chat, leave it.
         if (groupChat != null) {
-            groupChat.leave();
+            try {
+				groupChat.leave();
+			} catch (NotConnectedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             groupChat = null;
 
             if (messageEventManager != null) {
@@ -384,11 +416,12 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
         lastCheck = System.currentTimeMillis();
 
         try {
-            groupChat = new MultiUserChat(connection, roomName);
+        	MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
+            groupChat = manager.getMultiUserChat(roomName);
             if (name != null) {
                 try {
-                    AndFilter presenceFilter = new AndFilter(new PacketTypeFilter(Presence.class), new FromContainsFilter(groupChat.getRoom()));
-                    connection.addPacketListener(this, presenceFilter);
+                    AndFilter presenceFilter = new AndFilter(new StanzaTypeFilter(Presence.class), FromMatchesFilter.create(groupChat.getRoom()));
+                    connection.addAsyncStanzaListener(this, presenceFilter);
                     groupChat.join(name);
                 }
                 // Catch any join exceptions and attempt to join again
@@ -404,13 +437,16 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
                 nickname = "Visitor";
                 groupChat.join(nickname);
             }
-            groupChat.addParticipantListener(new PacketListener() {
-                public void processPacket(Packet packet) {
-                    final Presence p = (Presence)packet;
-                    final String from = p.getFrom();
-                    String user = StringUtils.parseResource(from);
+            
+            groupChat.addParticipantListener(new PresenceListener() {
+				
+				@Override
+				public void processPresence(Presence presence) {
+					// TODO Auto-generated method stub
+                    final String from = presence.getFrom();
+                    String user = XmppStringUtils.parseResource(from);
 
-                    if (p.getType() != Presence.Type.available) {
+                    if (presence.getType() != Presence.Type.available) {
                         lastAgent = user;
                     }
 
@@ -420,12 +456,10 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
                             checkForEmptyRoom();
                         }
                     }, 5000);
-
-
-                }
-            });
-
-            messageEventManager = new MessageEventManager(connection);
+				}
+			});
+            
+            messageEventManager = MessageEventManager.getInstanceFor(connection);
             messageEventManager.addMessageEventNotificationListener(this);
         }
         catch (Exception e) {
@@ -440,10 +474,15 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
         // See if we are the last one in the chat room.
         if (groupChat.getOccupantsCount() == 1) {
             // Leave the room.
-            groupChat.leave();
+            try {
+				groupChat.leave();
+			} catch (NotConnectedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             groupChat = null;
             // Cancel this listener.
-            connection.removePacketListener(this);
+            connection.removeAsyncStanzaListener(this);//removePacketListener(this);
             // Close the connection.
             connection.disconnect();
             connection = null;
@@ -520,10 +559,10 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
     public void cancelledNotification(String from, String packetID) {
     }
 
-    public void processPacket(Packet packet) {
+    public void processPacket(Stanza packet) {
         final Presence p = (Presence)packet;
         final String from = p.getFrom();
-        String user = StringUtils.parseResource(from);
+        String user = XmppStringUtils.parseResource(from);
 
         if (p.getType() == Presence.Type.available) {
             int count = groupChat==null?0:groupChat.getOccupantsCount();
@@ -563,10 +602,9 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
 
         for (int i = 0; i < 10; i++) {
             if (groupChat != null) {
-                Iterator iter = groupChat.getOccupants();
-                while (iter.hasNext()) {
-                    String occupant = (String)iter.next();
-                    String user = StringUtils.parseResource(occupant);
+                List<String> occupants = groupChat.getOccupants();
+                for (String occupant : occupants){
+                    String user = XmppStringUtils.parseResource(occupant);
                     if (!user.equals(name)) {
                         agent = user;
                         break;
@@ -664,12 +702,14 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
 
 
     public void listenForMessages(final XMPPConnection con, MultiUserChat chat) {
-        PacketListener packetListener = new PacketListener() {
-            public void processPacket(Packet packet) {
-                Message message = (Message)packet;
+    	MessageListener messageListner = new MessageListener() {
+			
+			@Override
+			public void processMessage(Message message) {
+				// TODO Auto-generated method stub
                 if (ModelUtil.hasLength(message.getBody())) {
                     ChatMessage chatMessage = new ChatMessage(message);
-                    String from = StringUtils.parseResource(message.getFrom());
+                    String from = XmppStringUtils.parseResource(message.getFrom());
                     if (from.equalsIgnoreCase(nickname)) {
                         return;
                     }
@@ -699,10 +739,10 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
                     ChatMessage me = new ChatMessage(message);
                     messageList.add(me);
                 }
-            }
-        };
+			}
+		};
 
-        groupChat.addMessageListener(packetListener);
+        groupChat.addMessageListener(messageListner);
     }
 
     /**

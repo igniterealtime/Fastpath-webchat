@@ -13,9 +13,11 @@
 package org.jivesoftware.webchat.providers;
 
 import org.jivesoftware.webchat.util.WebLog;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.PrivateDataManager;
+import org.jivesoftware.smackx.iqprivate.PrivateDataManager;
 
 import java.util.Map;
 
@@ -55,22 +57,30 @@ public class Settings {
      * @return a map of found settings.  If no settings have been found, it will
      * return null.
      */
-    public static Map getSettings(XMPPConnection con, String workgroup, String setting) {
+    public static Map<String , String> getSettings(XMPPConnection con, String workgroup, String setting) {
 
         try {
-            PrivateDataManager personalPDM = new PrivateDataManager(con, workgroup);
+            PrivateDataManager personalPDM = PrivateDataManager.getInstanceFor(con);
 
             String namespace = "workgroup:" + workgroup + ":settings:" + setting;
             String elementName = "workgroup_settings";
 
             PrivateDataManager.addPrivateDataProvider(elementName, namespace, new SettingsDataProvider());
             SettingsPrivateData data = (SettingsPrivateData) personalPDM.getPrivateData(elementName, namespace);
-            Map map = data.getMap();
+            Map<String , String> map = data.getMap();
             return map;
         }
         catch (XMPPException e) {
             WebLog.logError("Could not load private data:", e);
-        }
+        } catch (NoResponseException e) {
+			// TODO Auto-generated catch block
+        	WebLog.logError("NoResponseException:", e);
+			e.printStackTrace();
+		} catch (NotConnectedException e) {
+			// TODO Auto-generated catch block
+			WebLog.logError("NotConnectedException:", e);
+			e.printStackTrace();
+		}
         return null;
     }
 }
