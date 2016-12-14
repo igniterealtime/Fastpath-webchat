@@ -10,9 +10,7 @@
     <!-- GLOBAL TASKDEFs                                                                         -->
     <!-- ======================================================================================= -->
 
-    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
-        <classpath><pathelement location="${basedir}/build/lib/ant-contrib.jar"/></classpath>
-    </taskdef>
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
 
     <!-- ======================================================================================= -->
     <!-- PROPERTIES                                                                              -->
