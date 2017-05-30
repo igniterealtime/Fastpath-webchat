@@ -101,7 +101,6 @@ public class ChatUtils {
                     chat.sendMessage(chatMessage);
                 }
             }catch (NotConnectedException e) {
-				// TODO Auto-generated catch block
 				WebLog.logError("Error sending message:", e);
 			}
         }
