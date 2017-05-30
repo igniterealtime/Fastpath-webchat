@@ -13,6 +13,7 @@
 package org.jivesoftware.webchat.actions;
 
 import org.jivesoftware.webchat.ChatSession;
+import org.jivesoftware.webchat.util.WebLog;
 import org.jivesoftware.webchat.util.WebUtils;
 import org.jxmpp.util.XmppStringUtils;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
@@ -72,8 +73,7 @@ public final class ChatWriter {
 			    try {
 					chat.sendMessage(chatMessage);
 				} catch (NotConnectedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					WebLog.logError("Error sending message:", e);
 				}
 			}
         }

@@ -115,9 +115,7 @@ public class SettingsManager implements WorkgroupChangeListener {
             catch (XMPPException e) {
                 WebLog.logError("Error retrieving chat setting using key=" + key + " and workgroup=" + workgroupName, e);
             } catch (SmackException e) {
-				// TODO Auto-generated catch block
             	WebLog.logError("Smack error",e);
-				e.printStackTrace();
 			}
         }
         if (settings != null) {

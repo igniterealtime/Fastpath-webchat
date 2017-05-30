@@ -73,13 +73,9 @@ public class Settings {
         catch (XMPPException e) {
             WebLog.logError("Could not load private data:", e);
         } catch (NoResponseException e) {
-			// TODO Auto-generated catch block
-        	WebLog.logError("NoResponseException:", e);
-			e.printStackTrace();
+        	WebLog.logError("Could not load private data:", e);
 		} catch (NotConnectedException e) {
-			// TODO Auto-generated catch block
-			WebLog.logError("NotConnectedException:", e);
-			e.printStackTrace();
+			WebLog.logError("Could not load private data:", e);
 		}
         return null;
     }

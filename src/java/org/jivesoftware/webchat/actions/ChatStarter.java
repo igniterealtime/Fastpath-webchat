@@ -202,13 +202,11 @@ public class ChatStarter extends WebBean {
                 properties = wGroup.getWorkgroupProperties();
             }
             catch (XMPPException e) {
-            
+            	WebLog.logError("Error getting workgroup properties:", e);
             } catch (NoResponseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+            	WebLog.logError("Error getting workgroup properties:", e);
 			} catch (NotConnectedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				WebLog.logError("Error getting workgroup properties:", e);
 			}
 
             if (properties != null && properties.isAuthRequired()) {

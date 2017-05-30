@@ -274,8 +274,7 @@ public class ChatSession implements MessageEventNotificationListener, StanzaList
             catch (XMPPException e) {
                 WebLog.logError("Unable to join chat queue.", e);
             } catch (SmackException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+            	WebLog.logError("Unable to join chat queue:", e);
 			}
         }
 
@@ -376,11 +375,9 @@ public class ChatSession implements MessageEventNotificationListener, StanzaList
             catch (XMPPException xe) {
                 WebLog.logError("Error closing ChatSession:", xe);
             } catch (NoResponseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+            	WebLog.logError("Error closing ChatSession:", e);
 			} catch (NotConnectedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				WebLog.logError("Error closing ChatSession:", e);
 			}
         }
         // If we've already been routed and are in a chat, leave it.
@@ -388,8 +385,7 @@ public class ChatSession implements MessageEventNotificationListener, StanzaList
             try {
 				groupChat.leave();
 			} catch (NotConnectedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				WebLog.logError("Error could not leave group chat:", e);
 			}
             groupChat = null;
 
@@ -477,8 +473,7 @@ public class ChatSession implements MessageEventNotificationListener, StanzaList
             try {
 				groupChat.leave();
 			} catch (NotConnectedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				WebLog.logError("Error could not leave group chat:", e);
 			}
             groupChat = null;
             // Cancel this listener.

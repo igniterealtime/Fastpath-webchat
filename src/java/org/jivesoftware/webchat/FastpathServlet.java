@@ -233,14 +233,11 @@ public class FastpathServlet extends HttpServlet {
                     catch (XMPPException e) {
                         WebLog.logError("Error checking roster", e);
                     } catch (NotLoggedInException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+                    	WebLog.logError("Error checking roster", e);
 					} catch (NoResponseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						WebLog.logError("Error checking roster", e);
 					} catch (NotConnectedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						WebLog.logError("Error checking roster", e);
 					}
                 }
             }

@@ -77,11 +77,9 @@ public class PersonalChat implements MessageEventNotificationListener {
         catch (XMPPException e) {
             WebLog.logError("Error starting chat.", e);
         } catch (SmackException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+        	WebLog.logError("Error starting chat:", e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			WebLog.logError("Error starting chat:", e);
 		}
 
         this.jid = jid;
@@ -110,8 +108,7 @@ public class PersonalChat implements MessageEventNotificationListener {
         try {
 			chat.sendMessage(newMessage);
 		} catch (NotConnectedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			WebLog.logError("Error sending message:", e);
 		}
 
         timer = new Timer();
@@ -155,8 +152,7 @@ public class PersonalChat implements MessageEventNotificationListener {
             chat.sendMessage(newMessage);
         }
         catch (NotConnectedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+        	WebLog.logError("Error sending message:", e);
 		}
 
         if (con != null) {
@@ -191,8 +187,7 @@ public class PersonalChat implements MessageEventNotificationListener {
             chat.sendMessage(newMessage);
         }
         catch (NotConnectedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+        	WebLog.logError("Error sending message:", e);
 		}
     }
 

@@ -187,14 +187,11 @@ public final class WorkgroupStatus {
 			try {
 				isAvailable = workgroup.isAvailable();
 			} catch (NoResponseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				WebLog.logError("Error get presence:", e);
 			} catch (XMPPErrorException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				WebLog.logError("Error get presence:", e);
 			} catch (NotConnectedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				WebLog.logError("Error get presence:", e);
 			}
             presence = new Presence(isAvailable ? Presence.Type.available : Presence.Type.unavailable);
             workgroupPresence.put(workgroupName, presence);
@@ -283,7 +280,6 @@ public final class WorkgroupStatus {
         try {
 			result = discoManager.discoverItems("workgroup." + host);
 		} catch (XMPPErrorException e) {
-			// TODO Auto-generated catch block
 			return workgroupNames;
 		}
         
@@ -313,7 +309,7 @@ public final class WorkgroupStatus {
                 workgroupForms.put(workgroupName, form);
             }
             catch (XMPPException e) {
-                e.printStackTrace();
+            	WebLog.logError("Error get workgroup form:", e);
             }
         }
         return form;

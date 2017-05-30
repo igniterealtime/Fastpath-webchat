@@ -15,6 +15,7 @@ import org.jivesoftware.smackx.workgroup.user.Workgroup;
 import org.jivesoftware.webchat.actions.ChatQueue;
 import org.jivesoftware.webchat.personal.ChatMessage;
 import org.jivesoftware.webchat.util.FormText;
+import org.jivesoftware.webchat.util.WebLog;
 import org.jivesoftware.webchat.util.WebUtils;
 import org.jxmpp.util.XmppStringUtils;
 import org.jivesoftware.smack.SmackException.NoResponseException;
@@ -101,7 +102,7 @@ public class ChatUtils {
                 }
             }catch (NotConnectedException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				WebLog.logError("Error sending message:", e);
 			}
         }
     }
@@ -185,7 +186,7 @@ public class ChatUtils {
                 Thread.sleep(3000);
             }
             catch (InterruptedException e) {
-                e.printStackTrace();
+            	WebLog.logError("Error thread interrupted:", e);
             }
 
             queue.setConnectionDropped(!chatSession.isInQueue() && !chatSession.isInGroupChat());

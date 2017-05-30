@@ -85,14 +85,11 @@ public class DynamicImageServlet extends HttpServlet {
                 catch (XMPPException e) {
                    WebLog.logError("Error creating new roster entry:", e);
                 } catch (NotLoggedInException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+                	WebLog.logError("Error creating new roster entry:", e);
 				} catch (NoResponseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					WebLog.logError("Error creating new roster entry:", e);
 				} catch (NotConnectedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					WebLog.logError("Error creating new roster entry:", e);
 				}
             }
         }
