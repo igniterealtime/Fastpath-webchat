@@ -12,28 +12,28 @@
 
 package org.jivesoftware.liveassistant;
 
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-import org.jivesoftware.util.JiveGlobals;
-import org.jivesoftware.util.Log;
-import org.jivesoftware.openfire.container.AdminConsolePlugin;
-import org.jivesoftware.openfire.container.Plugin;
-import org.jivesoftware.openfire.container.PluginManager;
-import org.jivesoftware.openfire.XMPPServer;
-import org.apache.tomcat.InstanceManager;
-import org.apache.tomcat.SimpleInstanceManager;
-import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
-import org.eclipse.jetty.plus.annotation.ContainerInitializer;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.webapp.WebAppContext;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.SimpleInstanceManager;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
+import org.eclipse.jetty.plus.annotation.ContainerInitializer;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.webapp.WebAppContext;
+import org.jivesoftware.openfire.XMPPServer;
+import org.jivesoftware.openfire.container.AdminConsolePlugin;
+import org.jivesoftware.openfire.container.Plugin;
+import org.jivesoftware.openfire.container.PluginManager;
+import org.jivesoftware.util.JiveGlobals;
+import org.jivesoftware.util.Log;
 
 /**
  * Plugin implementation to allow the web client to operate as a plugin in Jive Messenger.
@@ -62,7 +62,7 @@ public class WebClientPlugin implements Plugin {
         final List<ContainerInitializer> initializers = new ArrayList<ContainerInitializer>();
         initializers.add( new ContainerInitializer( new JettyJasperInitializer(), null ) );
 
-        context = new WebAppContext( pluginDirectory.getPath(), File.separator + pluginDirectory.getName() );
+        context = new WebAppContext(null, pluginDirectory.getPath(), "/" + pluginDirectory.getName() );
         context.setAttribute( "org.eclipse.jetty.containerInitializers", initializers );
         context.setAttribute( InstanceManager.class.getName(), new SimpleInstanceManager() );
         context.setWelcomeFiles( new String[]{"index.jsp"} );
@@ -103,12 +103,30 @@ public class WebClientPlugin implements Plugin {
             Log.error(e);
         }
 
-        try {
-            context.start();
-        }
-        catch (Exception e) {
-            Log.error(e);
-        }
+        //Delay starting of the web-app, while XMPP connection is not yet ready, and connect will fail
+        Thread t = new Thread( new Runnable() {
+          
+          @Override
+          public void run() {
+            
+            try {
+              Thread.sleep(5000);
+              
+              if ( !context.isStarted() && contexts.isStarted() ) {
+                Log.info("Starting Context");
+                context.start();
+              }
+              Log.info("Started Context");
+            } catch (Exception e) {
+              Log.error(e);
+              
+            }
+            
+          }
+        } );
+        
+        t.start();
+        
     }
 
     public void destroyPlugin() {

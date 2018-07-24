@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="src" path="src/plugin/java"/>
+	<classpathentry kind="lib" path="build/lib/ant-contrib.jar"/>
+	<classpathentry kind="lib" path="build/lib/commons-el.jar"/>
+	<classpathentry kind="lib" path="build/lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="build/lib/merge/xstream.jar"/>
+	<classpathentry kind="lib" path="src/webapp/WEB-INF/lib/activation.jar"/>
+	<classpathentry kind="lib" path="src/webapp/WEB-INF/lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="src/webapp/WEB-INF/lib/dwr.jar"/>
+	<classpathentry kind="lib" path="src/webapp/WEB-INF/lib/email.jar"/>
+	<classpathentry kind="lib" path="src/webapp/WEB-INF/lib/jstl.jar"/>
+	<classpathentry kind="lib" path="src/webapp/WEB-INF/lib/mail.jar"/>
+	<classpathentry kind="lib" path="src/webapp/WEB-INF/lib/smack-3.2.1.jar"/>
+	<classpathentry kind="lib" path="src/webapp/WEB-INF/lib/smackx-3.2.1.jar"/>
+	<classpathentry kind="lib" path="src/webapp/WEB-INF/lib/smackx-debug.jar"/>
+	<classpathentry kind="lib" path="src/webapp/WEB-INF/lib/standard.jar"/>
+	<classpathentry kind="lib" path="src/webapp/WEB-INF/lib/xstream-1.3.1.jar"/>
+	<classpathentry kind="lib" path="target/classes/jspc/WEB-INF/lib/plugin-webclient-jspc.jar"/>
+	<classpathentry kind="lib" path="target/plugin/plugin-webclient.jar"/>
+	<classpathentry kind="lib" path="target/plugin/temp/lib/plugin-webclient.jar"/>
+	<classpathentry kind="lib" path="target/webclient.jar"/>
+	<classpathentry kind="lib" path="C:/Users/vliet/workspace/jchat/openfire/Openfire-dirty/target/openfire/lib/openfire.jar"/>
+	<classpathentry kind="output" path="target/classes/core"/>
+</classpath>
