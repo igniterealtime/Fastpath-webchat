@@ -23,6 +23,7 @@
     <mina.version>2.0.7</mina.version>
     <bouncycastle.version>1.59</bouncycastle.version>
     <slf4j.version>1.7.7</slf4j.version>
+    <openfire.version>4.3.0-SNAPSHOT</openfire.version>
   </properties>
 
   <developers>
@@ -36,7 +37,43 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>3.2.2</version>
+        <configuration>
+          <webXml>${project.basedir}/target/web.xml</webXml>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-jspc-maven-plugin</artifactId>
+        <version>9.4.11.v20180605</version>
+        <executions>
+          <execution>
+            <id>jspc</id>
+            <goals>
+              <goal>jspc</goal>
+            </goals>
+            <configuration>
+              <jspc>
+                <package>org.jivesoftware.webclient.jsp</package>
+              </jspc>
+              <webAppSourceDirectory>${project.build.sourceDirectory}/../webapp</webAppSourceDirectory>
+              <webXml>${project.build.sourceDirectory}/../webapp/WEB-INF/web.xml</webXml>
+              <sourceVersion>1.8</sourceVersion>
+              <targetVersion>1.8</targetVersion>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.mortbay.jasper</groupId>
+            <artifactId>apache-jsp</artifactId>
+            <version>8.5.23</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.jetty.toolchain</groupId>
+            <artifactId>jetty-schemas</artifactId>
+            <version>4.0.1</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>
@@ -86,13 +123,19 @@
     <dependency>
       <groupId>org.directwebremoting</groupId>
       <artifactId>dwr</artifactId>
-      <version>2.0.3</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>jstl</artifactId>
       <version>1.2</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-jsp</artifactId>
+      <version>8.5.23</version>
+    </dependency>
+
   </dependencies>
 
 </project>
