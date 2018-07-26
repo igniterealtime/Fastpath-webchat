@@ -6,5 +6,8 @@ out
 # The repository should not contain the result of project builds
 target
 lib-org
-/.settings
+.settings
+.project
+.classpath
+.settings/*
 /bin

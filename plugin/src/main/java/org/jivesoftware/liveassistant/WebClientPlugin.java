@@ -14,15 +14,10 @@ package org.jivesoftware.liveassistant;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
@@ -70,38 +65,38 @@ public class WebClientPlugin implements Plugin {
         final ContextHandlerCollection contexts = ( (AdminConsolePlugin) pluginManager.getPlugin( "admin" ) ).getContexts();
         contexts.addHandler( context );
 
-        // The embedded web server doesn't know how to compile JSPs. Therefore, we have
-        // to manually parse a generated web.xml file and add the entries as servlets
-        // to the webapp.
-        try {
-            // Make the reader non-validating so that it doesn't try to resolve external
-            // DTD's. Trying to resolve external DTD's can break on some firewall configurations.
-            SAXReader saxReader = new SAXReader(false);
-            saxReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",
-                    false);
-            Document doc = saxReader.read(new File(pluginDirectory, "WEB-INF" +
-                    File.separator + "web.xml.generated"));
-            // Find all <servlet> entries to discover name to class mapping.
-            List classes = doc.selectNodes("//servlet");
-            Map classMap = new HashMap();
-            for (int i = 0; i < classes.size(); i++) {
-                Element servletElement = (Element)classes.get(i);
-                String name = servletElement.element("servlet-name").getTextTrim();
-                String className = servletElement.element("servlet-class").getTextTrim();
-                classMap.put(name, className);
-            }
-            // Find all <servelt-mapping> entries to discover name to URL mapping.
-            List names = doc.selectNodes("//servlet-mapping");
-            for (int i = 0; i < names.size(); i++) {
-                Element nameElement = (Element)names.get(i);
-                String name = nameElement.element("servlet-name").getTextTrim();
-                String url = nameElement.element("url-pattern").getTextTrim();
-                context.addServlet((String)classMap.get(name), url);
-            }
-        }
-        catch (Exception e) {
-            Log.error(e);
-        }
+//        // The embedded web server doesn't know how to compile JSPs. Therefore, we have
+//        // to manually parse a generated web.xml file and add the entries as servlets
+//        // to the webapp.
+//        try {
+//            // Make the reader non-validating so that it doesn't try to resolve external
+//            // DTD's. Trying to resolve external DTD's can break on some firewall configurations.
+//            SAXReader saxReader = new SAXReader(false);
+//            saxReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",
+//                    false);
+//            Document doc = saxReader.read(new File(pluginDirectory, "WEB-INF" +
+//                    File.separator + "web.xml.generated"));
+//            // Find all <servlet> entries to discover name to class mapping.
+//            List classes = doc.selectNodes("//servlet");
+//            Map classMap = new HashMap();
+//            for (int i = 0; i < classes.size(); i++) {
+//                Element servletElement = (Element)classes.get(i);
+//                String name = servletElement.element("servlet-name").getTextTrim();
+//                String className = servletElement.element("servlet-class").getTextTrim();
+//                classMap.put(name, className);
+//            }
+//            // Find all <servelt-mapping> entries to discover name to URL mapping.
+//            List names = doc.selectNodes("//servlet-mapping");
+//            for (int i = 0; i < names.size(); i++) {
+//                Element nameElement = (Element)names.get(i);
+//                String name = nameElement.element("servlet-name").getTextTrim();
+//                String url = nameElement.element("url-pattern").getTextTrim();
+//                context.addServlet((String)classMap.get(name), url);
+//            }
+//        }
+//        catch (Exception e) {
+//            Log.error(e);
+//        }
 
         //Delay starting of the web-app, while XMPP connection is not yet ready, and connect will fail
         Thread t = new Thread( new Runnable() {

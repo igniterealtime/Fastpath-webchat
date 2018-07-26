@@ -7,9 +7,9 @@
     <version>4.3.0-SNAPSHOT</version>
   </parent>
   <groupId>org.igniterealtime.openfire.fastpath</groupId>
-  <artifactId>fastpath-war</artifactId>
+  <artifactId>webchat</artifactId>
   <version>2.6.2</version>
-  <packaging>war</packaging>
+  <packaging>pom</packaging>
   <name>Fastpath Webchat</name>
   <description>Web based chat client for Fastpath</description>
 
@@ -19,123 +19,29 @@
         <!-- Versions -->
         <!-- Note; the following jetty.version should be identical to the jetty.version in plugins/pom.xml -->
     <jetty.version>9.4.11.v20180605</jetty.version>
-    <standard-taglib.version>1.2.5</standard-taglib.version>
-    <mina.version>2.0.7</mina.version>
-    <bouncycastle.version>1.59</bouncycastle.version>
-    <slf4j.version>1.7.7</slf4j.version>
-    <openfire.version>4.3.0-SNAPSHOT</openfire.version>
+    <plugin.name>webchat</plugin.name>
   </properties>
 
   <developers>
+     <developer>
+            <name>Guus der Kinderen</name>
+            <roles>
+                <role>Lead Developer</role>
+            </roles>
+            <email>guus.der.kinderen@gmail.com</email>
+            <timezone>+1</timezone>
+            <organization>Ignite Realtime</organization>
+            <organizationUrl>http://www.igniterealtime.org</organizationUrl>
+        </developer>
     <developer>
-      <name>Ryan Graham</name>
+      <name>Anno van Vliet</name>
     </developer>
-  </developers>
+ </developers>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <configuration>
-          <webXml>${project.basedir}/target/web.xml</webXml>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-jspc-maven-plugin</artifactId>
-        <version>9.4.11.v20180605</version>
-        <executions>
-          <execution>
-            <id>jspc</id>
-            <goals>
-              <goal>jspc</goal>
-            </goals>
-            <configuration>
-              <jspc>
-                <package>org.jivesoftware.webclient.jsp</package>
-              </jspc>
-              <webAppSourceDirectory>${project.build.sourceDirectory}/../webapp</webAppSourceDirectory>
-              <webXml>${project.build.sourceDirectory}/../webapp/WEB-INF/web.xml</webXml>
-              <sourceVersion>1.8</sourceVersion>
-              <targetVersion>1.8</targetVersion>
-            </configuration>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.mortbay.jasper</groupId>
-            <artifactId>apache-jsp</artifactId>
-            <version>8.5.23</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.jetty.toolchain</groupId>
-            <artifactId>jetty-schemas</artifactId>
-            <version>4.0.1</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-    </plugins>
-  </build>
+  <modules>
+    <module>war</module>
+    <module>plugin</module>
+  </modules>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.igniterealtime.smack</groupId>
-      <artifactId>smack</artifactId>
-      <version>3.2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.igniterealtime.smack</groupId>
-      <artifactId>smackx</artifactId>
-      <version>3.2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.igniterealtime.smack</groupId>
-      <artifactId>smackx-debug</artifactId>
-      <version>3.2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
-      <version>1.3.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>apache-jsp</artifactId>
-      <version>${jetty.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.mail</groupId>
-      <artifactId>mail</artifactId>
-      <version>1.4.5</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.2</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-el</groupId>
-      <artifactId>commons-el</artifactId>
-      <version>1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.directwebremoting</groupId>
-      <artifactId>dwr</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>jstl</artifactId>
-      <version>1.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.mortbay.jasper</groupId>
-      <artifactId>apache-jsp</artifactId>
-      <version>8.5.23</version>
-    </dependency>
-
-  </dependencies>
 
 </project>
