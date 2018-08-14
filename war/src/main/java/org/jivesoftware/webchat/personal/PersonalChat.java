@@ -10,19 +10,24 @@
  */
 package org.jivesoftware.webchat.personal;
 
-import org.jivesoftware.webchat.ChatManager;
-import org.jivesoftware.webchat.util.WebLog;
-import org.jivesoftware.webchat.settings.ConnectionSettings;
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smackx.MessageEventManager;
-import org.jivesoftware.smackx.MessageEventNotificationListener;
-
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.chat.Chat;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.jiveproperties.JivePropertiesManager;
+import org.jivesoftware.smackx.xevent.MessageEventManager;
+import org.jivesoftware.smackx.xevent.MessageEventNotificationListener;
+import org.jivesoftware.webchat.ChatManager;
+import org.jivesoftware.webchat.settings.ConnectionSettings;
+import org.jivesoftware.webchat.util.WebLog;
+import org.jxmpp.jid.Jid;
 
 /* RCSFile: $
  * Revision: $
@@ -36,11 +41,11 @@ import java.util.TimerTask;
 
 public class PersonalChat implements MessageEventNotificationListener {
     private Chat chat;
-    private XMPPConnection con;
+    private XMPPTCPConnection con;
     private ChatPoller chatPoller;
 
     // User information
-    private String jid;
+    private Jid jid;
     private String nickname;
     private MessageEventManager messageEventManager;
     private boolean agentTyping = false;
@@ -54,19 +59,24 @@ public class PersonalChat implements MessageEventNotificationListener {
 
     }
 
-    public void startChat(String jid, String nickname, String email, String question) {
+    public void startChat(Jid jid, String nickname, String email, String question) {
         ChatManager chatManager = ChatManager.getInstance();
         ConnectionSettings settings = chatManager.getChatSettingsManager().getSettings();
         String host = settings.getServerDomain();
         int port = settings.getPort();
         try {
-            ConnectionConfiguration config = new ConnectionConfiguration(host, port);
-            con = new XMPPConnection(config);
+          XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder()
+           .setSecurityMode(XMPPTCPConnectionConfiguration.SecurityMode.disabled)
+           .setXmppDomain(host)
+           .setHost(host)
+           .setPort(port);
+          config.performSaslAnonymousAuthentication();
+          con = new XMPPTCPConnection(config.build());
             con.connect();
-            con.loginAnonymously();
+            con.login();
             chatPoller = new ChatPoller();
         }
-        catch (XMPPException e) {
+        catch (XMPPException | SmackException | IOException | InterruptedException e) {
             WebLog.logError("Error starting chat.", e);
         }
 
@@ -79,20 +89,20 @@ public class PersonalChat implements MessageEventNotificationListener {
 
         chatPoller.listenForMessages(con, chat);
 
-        messageEventManager = new MessageEventManager(con);
+        messageEventManager = MessageEventManager.getInstanceFor(con);
         messageEventManager.addMessageEventNotificationListener(this);
 
         Message newMessage = new Message();
         newMessage.setTo(jid);
-        newMessage.setProperty("nickname", nickname);
-        newMessage.setProperty("anonymous", true);
-        newMessage.setProperty("email", email);
-        newMessage.setProperty("question", question);
+        JivePropertiesManager.addProperty(newMessage , "nickname", nickname);
+        JivePropertiesManager.addProperty(newMessage , "anonymous", true);
+        JivePropertiesManager.addProperty(newMessage , "email", email);
+        JivePropertiesManager.addProperty(newMessage , "question", question);
         newMessage.setBody( "I would like to chat with you.");
         try {
             chat.sendMessage(newMessage);
         }
-        catch (XMPPException e) {
+        catch ( NotConnectedException | InterruptedException e) {
               WebLog.logError("Error starting chat.", e);
         }
 
@@ -123,15 +133,15 @@ public class PersonalChat implements MessageEventNotificationListener {
     public void endChat() {
         Message newMessage = new Message();
         newMessage.setTo(jid);
-        newMessage.setProperty("nickname", nickname);
-        newMessage.setProperty("anonymous", true);
-        newMessage.setProperty("email", email);
-        newMessage.setProperty("left", true);
+        JivePropertiesManager.addProperty(newMessage , "nickname", nickname);
+        JivePropertiesManager.addProperty(newMessage , "anonymous", true);
+        JivePropertiesManager.addProperty(newMessage , "email", email);
+        JivePropertiesManager.addProperty(newMessage , "left", true);
         newMessage.setBody(nickname+ " has left the conversation.");
         try {
             chat.sendMessage(newMessage);
         }
-        catch (XMPPException e) {
+        catch ( NotConnectedException | InterruptedException e) {
             WebLog.logError("Error ending chat.", e);
         }
 
@@ -156,19 +166,19 @@ public class PersonalChat implements MessageEventNotificationListener {
     public void sendMessage(String message) {
         Message newMessage = new Message();
         newMessage.setTo(jid);
-        newMessage.setProperty("nickname", nickname);
-        newMessage.setProperty("anonymous", true);
-        newMessage.setProperty("email", email);
+        JivePropertiesManager.addProperty(newMessage , "nickname", nickname);
+        JivePropertiesManager.addProperty(newMessage , "anonymous", true);
+        JivePropertiesManager.addProperty(newMessage , "email", email);
         newMessage.setBody(message);
         try {
             chat.sendMessage(newMessage);
         }
-        catch (XMPPException e) {
+        catch ( NotConnectedException | InterruptedException e) {
             WebLog.logError("Error sending message.", e);
         }
     }
 
-    public void customerIsTyping() {
+    public void customerIsTyping() throws NotConnectedException, InterruptedException {
         messageEventManager.sendComposingNotification(jid, "l0k1");
     }
 
@@ -179,19 +189,19 @@ public class PersonalChat implements MessageEventNotificationListener {
     }
 
 
-    public void deliveredNotification(String chatID, String chatID1) {
+    public void deliveredNotification(Jid chatID, String chatID1) {
     }
 
-    public void displayedNotification(String chatID, String chatID1) {
+    public void displayedNotification(Jid chatID, String chatID1) {
     }
 
-    public void composingNotification(String chatID, String chatID1) {
+    public void composingNotification(Jid chatID, String chatID1) {
         agentTyping = true;
     }
 
-    public void offlineNotification(String chatID, String chatID1) {
+    public void offlineNotification(Jid chatID, String chatID1) {
     }
 
-    public void cancelledNotification(String chatID, String chatID1) {
+    public void cancelledNotification(Jid chatID, String chatID1) {
     }
 }

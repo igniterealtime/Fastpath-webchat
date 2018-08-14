@@ -16,8 +16,8 @@
                    org.jivesoftware.webchat.util.FormText" %><%@ page import="org.jivesoftware.smackx.workgroup.settings.SoundSettings"%><%@ page import="org.jivesoftware.smack.XMPPException"%><%@ page import="org.jivesoftware.webchat.util.WebUtils"%>
 <%@ page import="org.jivesoftware.webchat.util.StringUtils" %>
 <script type='text/javascript' src='common.js'></script>
-<script type='text/javascript' src='<%= request.getContextPath()%>/dwr/interface/room.js'></script>
 <script type='text/javascript' src='<%= request.getContextPath()%>/dwr/engine.js'></script>
+<script type='text/javascript' src='<%= request.getContextPath()%>/dwr/interface/room.js'></script>
 
 <%
    final String chatID = request.getParameter("chatID");
@@ -32,7 +32,7 @@
      question = "Question: " + (String) map.get( "question" );
    }
 
-   String userNickname = chatSession.getNickname();
+   String userNickname = chatSession.getNickname().toString();
    userNickname = WebUtils.replace(userNickname, "'", "&apos;");
    userNickname = WebUtils.replace(userNickname, "\"", "&quot;");
 
@@ -51,7 +51,7 @@
 
      var lastChecked = 0;
 
-     DWREngine.setErrorHandler(handleError);
+     dwr.engine.setErrorHandler(handleError);
 
      function handleError(error) {
          // check for connectivity.
@@ -78,7 +78,7 @@
 
          checkForNewMessages();
          checkIfAgentTyping();
-         DWREngine.setErrorHandler(handleError);
+         dwr.engine.setErrorHandler(handleError);
          checker = 0;
      }
     
@@ -231,7 +231,7 @@
      function doit() {
     <%
 
-      String initialAgent = chatSession.getInitialAgent();
+      String initialAgent = chatSession.getInitialAgent().toString();
       if(initialAgent == null){
          %>
            alert("We are unable to connect you to an agent. Please try back later.")

@@ -12,17 +12,6 @@
 
 package org.jivesoftware.webchat;
 
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.webchat.actions.WorkgroupStatus;
-import org.jivesoftware.webchat.settings.ChatSettingsManager;
-import org.jivesoftware.webchat.settings.ConnectionSettings;
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.ConnectionListener;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.webchat.util.WebLog;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +23,20 @@ import java.util.TimerTask;
 
 import javax.servlet.ServletContext;
 
+import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.webchat.actions.WorkgroupStatus;
+import org.jivesoftware.webchat.settings.ChatSettingsManager;
+import org.jivesoftware.webchat.settings.ConnectionSettings;
+import org.jivesoftware.webchat.util.WebLog;
+import org.jxmpp.jid.EntityBareJid;
+
+
 /**
  * The ChatManager for the Web Chat Service. The ChatManager handles all ChatSessions,
  * connections, and settings handlers for the Web Chat Service.
@@ -42,7 +45,7 @@ import javax.servlet.ServletContext;
  */
 public final class ChatManager {
     private Map<String, ChatSession> sessions;
-    private XMPPConnection globalConnection;
+    private XMPPTCPConnection globalConnection;
     private ChatSettingsManager chatSettingsManager;
 
     /**
@@ -83,7 +86,10 @@ public final class ChatManager {
      * Creates a new session manager.
      */
     private ChatManager() {
-        sessions = Collections.synchronizedMap(new HashMap());
+      
+      new WorkgroupInitializer().initialize();
+
+        sessions = Collections.synchronizedMap(new HashMap<>());
 
         // Setup timer to check for lingering sessions.
         final Timer timer = new Timer();
@@ -105,6 +111,7 @@ public final class ChatManager {
         while (chatSessions.hasNext()) {
             final ChatSession chatSession = chatSessions.next();
             final long lastCheck = chatSession.getLastCheck();
+            
             if (chatSession.isClosed()) {
                 if (lastCheck < now - MAXIMUM_STALE_SESSION_LENGTH_IN_MS) {
                     removeChatSession(chatSession.getSessionID());
@@ -132,12 +139,12 @@ public final class ChatManager {
                                 chatMessage.setType(Message.Type.groupchat);
                                 chatMessage.setBody("The webchat client connection appears to unstable. No data has been received in the last " + inactivityInSecs + " seconds.");
 
-                                String room = chat.getRoom();
+                                EntityBareJid room = chat.getRoom();
                                 chatMessage.setTo(room);
                                 chat.sendMessage(chatMessage);
 
                                 chatSession.setInactivityWarningSent(true);
-                            } catch (XMPPException e) {
+                            } catch (NotConnectedException | InterruptedException e) {
                                 WebLog.logError("Error sending message:", e);
                             }
                         }
@@ -222,13 +229,13 @@ public final class ChatManager {
      * Removes all ChatSessions from the Manager.
      */
     public void destroyAllSessions() {
-        Collection chatSessions = getChatSessions();
-        Iterator iter = chatSessions.iterator();
+        Collection<ChatSession> chatSessions = getChatSessions();
+        Iterator<ChatSession> iter = chatSessions.iterator();
         while (iter.hasNext()) {
-            ChatSession chatSession = (ChatSession)iter.next();
+            ChatSession chatSession = iter.next();
             chatSession.close();
         }
-        sessions = new HashMap();
+        sessions = new HashMap<>();
     }
 
     /**
@@ -236,18 +243,18 @@ public final class ChatManager {
      *
      * @param con the <code>XMPPConnection</code> for the Web Client Service.
      */
-    public void setGlobalConnection(XMPPConnection con) {
+    public void setGlobalConnection(XMPPTCPConnection con) {
         globalConnection = con;
 
         WorkgroupStatus.initStatusListener();
     }
 
     /**
-     * Gets the Global <code>XMPPConnection</code> for the Web Client Service.
+     * Gets the Global <code>XMPPTCPConnection</code> for the Web Client Service.
      *
-     * @return the <code>XMPPConnection</code> for the Web Client Service.
+     * @return the <code>XMPPTCPConnection</code> for the Web Client Service.
      */
-    public XMPPConnection getGlobalConnection() {
+    public XMPPTCPConnection getGlobalConnection() {
         return globalConnection;
     }
 
@@ -275,9 +282,11 @@ public final class ChatManager {
 
     /**
      * Connection Handling.
+     * @param context 
+     * @return 
      */
-    public synchronized XMPPConnection createConnection(final ServletContext context) {
-        XMPPConnection xmppConn = null;
+    public synchronized XMPPTCPConnection createConnection(final ServletContext context) {
+      XMPPTCPConnection xmppConn = null;
 
         ConnectionSettings settings = chatSettingsManager.getSettings();
         if (settings == null) {
@@ -294,42 +303,59 @@ public final class ChatManager {
         // Initialize the XMPP connection
         try {
 
-            if (port == -1) {
-                xmppConn = new XMPPConnection(host);
-            }
-            else {
-                ConnectionConfiguration config = new ConnectionConfiguration(host, port);
-                xmppConn = new XMPPConnection(config);
-            }
+          XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder()
+             .setSecurityMode(XMPPTCPConnectionConfiguration.SecurityMode.disabled)
+             .setXmppDomain(host)
+             .setHost(host)
+             .setPort(port);
+          
+          config.performSaslAnonymousAuthentication();
+          
+          xmppConn = new XMPPTCPConnection(config.build());
             xmppConn.connect();
 
             // Login the presence bot user
-            xmppConn.loginAnonymously();
+            xmppConn.login();
 
             // Add Connection to Application Object
             setGlobalConnection(xmppConn);
 
             // Add a connection listener.
             xmppConn.addConnectionListener(new ConnectionListener() {
+                @Override
                 public void connectionClosed() {
                     context.log("Main Connection closed for some reason");
                 }
 
+                @Override
                 public void connectionClosedOnError(Exception e) {
                     context.log("Connection closed on Error", e);
                 }
 
 
+                @Override
                 public void reconnectingIn(int i) {
 
                 }
 
+                @Override
                 public void reconnectionSuccessful() {
 
                 }
 
+                @Override
                 public void reconnectionFailed(Exception exception) {
 
+                }
+
+                @Override
+                public void connected(XMPPConnection connection) {
+                  
+                }
+
+                @Override
+                public void authenticated(XMPPConnection connection, boolean resumed) {
+                  
                 }
             });
         }

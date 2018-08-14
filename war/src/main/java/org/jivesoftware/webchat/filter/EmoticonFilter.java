@@ -10,11 +10,11 @@
 
 package org.jivesoftware.webchat.filter;
 
-import org.jivesoftware.webchat.util.ModelUtil;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import org.jivesoftware.webchat.util.ModelUtil;
 
 /**
  * A Filter that converts ASCII emoticons into image equivalents.
@@ -46,7 +46,7 @@ import java.util.StringTokenizer;
  * </table>
  */
 public class EmoticonFilter {
-    private static final Map EMOTICON_MAP = new HashMap();
+    private static final Map<String , String> EMOTICON_MAP = new HashMap<>();
 
     private EmoticonFilter() {
         // Not instantiable.

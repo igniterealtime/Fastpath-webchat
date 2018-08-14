@@ -1,4 +1,4 @@
-<%@ page import = "org.jivesoftware.smack.XMPPConnection,
+<%@ page import = "org.jivesoftware.smack.tcp.XMPPTCPConnection,
                    org.jivesoftware.webchat.ChatManager,
                    org.jivesoftware.webchat.util.ModelUtil,
                    org.jivesoftware.webchat.util.ParamUtils,
@@ -6,7 +6,9 @@
                    org.jivesoftware.smack.util.StringUtils,
                    org.jivesoftware.smackx.workgroup.user.WorkgroupExt,
                    org.jivesoftware.smackx.workgroup.settings.OfflineSettings,
-                   org.jivesoftware.smack.XMPPException"
+                   org.jivesoftware.smack.XMPPException,
+                   org.jxmpp.jid.Jid,
+                   org.jxmpp.jid.impl.JidCreate"
                    errorPage="../fatal.jsp"%><%@ page import="java.util.Map"%><%@ page import="java.util.Iterator"%>
 
 <%
@@ -17,7 +19,7 @@
         chatID = (String)session.getAttribute("chatID");
     }
 
-    Map metadata = null;
+    Map<String,Object> metadata = null;
 
     if(ModelUtil.hasLength(chatID)){
        ChatSession chatSession = chatManager.getChatSession(chatID);
@@ -35,10 +37,12 @@
     if(workgroup == null){
         workgroup = (String)session.getAttribute("workgroup");
     }
+    Jid workgroupJid = JidCreate.from(workgroup);
 
-    XMPPConnection con = chatManager.getGlobalConnection();
+    
+    XMPPTCPConnection con = chatManager.getGlobalConnection();
 
-    WorkgroupExt offlineWorkgroup = new WorkgroupExt(workgroup, con);
+    WorkgroupExt offlineWorkgroup = new WorkgroupExt(workgroupJid, con);
     boolean isEmailConfigured = offlineWorkgroup.isEmailAvailable();
     OfflineSettings offlineSettings = null;
     try {
@@ -126,7 +130,7 @@
         }
     }
 
-    String sendValue = StringUtils.escapeForXML(buf.toString());
+    String sendValue = StringUtils.escapeForXML(buf.toString()).toString();
 
 %>
 

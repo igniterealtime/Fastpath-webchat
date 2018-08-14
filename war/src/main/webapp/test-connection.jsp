@@ -12,7 +12,8 @@
 
 <%@ page import="org.jivesoftware.webchat.ChatManager" %>
 <%@ page import="org.jivesoftware.webchat.settings.ConnectionSettings" %>
-<%@ page import="org.jivesoftware.smack.XMPPConnection" %>
+<%@page import="org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration"%>
+<%@page import="org.jivesoftware.smack.tcp.XMPPTCPConnection"%>
 <%@ page import="org.jivesoftware.smack.XMPPException" %>
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="java.io.StringWriter" %>
@@ -32,13 +33,17 @@
             <%
                 ConnectionSettings settings = ChatManager.getInstance().getChatSettingsManager().getSettings();
                 boolean ok = false;
-                XMPPConnection con = null;
+                XMPPTCPConnection con = null;
                 try {
-                    ConnectionConfiguration xmppConfig = new ConnectionConfiguration(
-                            settings.getServerDomain(), settings.getPort());
-                    con = new XMPPConnection(xmppConfig);
+                 XMPPTCPConnectionConfiguration.Builder xmppConfig =  XMPPTCPConnectionConfiguration.builder()
+                     .setSecurityMode(XMPPTCPConnectionConfiguration.SecurityMode.disabled)
+                     .setXmppDomain(settings.getServerDomain())
+                       .setHost(settings.getServerDomain())
+                       .setPort(settings.getPort());
+                 xmppConfig.performSaslAnonymousAuthentication();
+                    con = new XMPPTCPConnection(xmppConfig.build());
                     con.connect();
-                    con.loginAnonymously();
+                    con.login();
                     ok = true;
                 }
                 catch (XMPPException e) {

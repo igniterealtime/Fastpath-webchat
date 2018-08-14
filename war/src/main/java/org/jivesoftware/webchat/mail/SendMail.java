@@ -12,13 +12,6 @@
 
 package org.jivesoftware.webchat.mail;
 
-import org.jivesoftware.webchat.ChatManager;
-import org.jivesoftware.webchat.actions.WebBean;
-import org.jivesoftware.webchat.providers.Settings;
-import org.jivesoftware.webchat.util.ModelUtil;
-import org.jivesoftware.webchat.util.WebLog;
-import org.jivesoftware.smack.XMPPConnection;
-
 import java.rmi.server.UID;
 import java.util.Date;
 import java.util.Map;
@@ -35,6 +28,13 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.webchat.ChatManager;
+import org.jivesoftware.webchat.actions.WebBean;
+import org.jivesoftware.webchat.providers.Settings;
+import org.jivesoftware.webchat.util.ModelUtil;
+import org.jivesoftware.webchat.util.WebLog;
 
 /**
  * Sends an email using simple SMTP to the specified addresse(s).
@@ -55,7 +55,7 @@ public class SendMail extends WebBean {
         try {
             // Set settings for this session
             XMPPConnection con = chatManager.getGlobalConnection();
-            Map map = Settings.getSettings(con, workgroup, Settings.EMAIL_SETTINGS);
+            Map<String , String> map = Settings.getSettings(con, workgroup, Settings.EMAIL_SETTINGS);
             String host = (String)map.get("host");
             String port = (String)map.get("port");
             String password = (String)map.get("password");

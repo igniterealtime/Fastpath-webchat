@@ -12,15 +12,6 @@
 
 package org.jivesoftware.webchat.util;
 
-import org.jivesoftware.smackx.workgroup.settings.ChatSetting;
-import org.jivesoftware.smackx.workgroup.settings.ChatSettings;
-import org.jivesoftware.smackx.workgroup.user.Workgroup;
-import org.jivesoftware.webchat.ChatManager;
-import org.jivesoftware.webchat.actions.WorkgroupChangeListener;
-import org.jivesoftware.webchat.actions.WorkgroupStatus;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
@@ -30,6 +21,18 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.provider.ProviderManager;
+import org.jivesoftware.smackx.workgroup.settings.ChatSetting;
+import org.jivesoftware.smackx.workgroup.settings.ChatSettings;
+import org.jivesoftware.smackx.workgroup.user.Workgroup;
+import org.jivesoftware.webchat.ChatManager;
+import org.jivesoftware.webchat.actions.WorkgroupChangeListener;
+import org.jivesoftware.webchat.actions.WorkgroupStatus;
+import org.jxmpp.jid.Jid;
 
 /**
  * Responsible for retrieving and writing out images belong to a workgroup.
@@ -42,7 +45,7 @@ public class SettingsManager implements WorkgroupChangeListener {
      * Stores the ChatSettings of each workgroup, and will be updated
      * when packet date of workgroup changes.
      */
-    private Map chatSettings = new HashMap();
+    private Map<Jid , ChatSettings> chatSettings = new HashMap<>();
 
 
     private static SettingsManager singleton;
@@ -96,20 +99,21 @@ public class SettingsManager implements WorkgroupChangeListener {
         }
     }
 
-    public ChatSetting getChatSetting(String key, String workgroupName) {
+    public ChatSetting getChatSetting(String key, Jid workgroupJid) {
         ChatSettings settings = null;
-        if (chatSettings.containsKey(workgroupName)) {
-            settings = (ChatSettings)chatSettings.get(workgroupName);
+        if (chatSettings.containsKey(workgroupJid)) {
+            settings = (ChatSettings)chatSettings.get(workgroupJid);
         }
         else {
             XMPPConnection connection = chatManager.getGlobalConnection();
-            Workgroup workgroup = new Workgroup(workgroupName, connection);
+            Workgroup workgroup = new Workgroup(workgroupJid, connection);
             try {
                 settings = workgroup.getChatSettings();
-                chatSettings.put(workgroupName, settings);
+                chatSettings.put(workgroupJid, settings);
             }
-            catch (XMPPException e) {
-                WebLog.logError("Error retrieving chat setting using key=" + key + " and workgroup=" + workgroupName, e);
+            catch (XMPPException | SmackException | InterruptedException e) {
+              // TODO better is throwing this exception
+                WebLog.logError("Error retrieving chat setting using key=" + key + " and workgroup=" + workgroupJid, e);
             }
         }
         if (settings != null) {
@@ -123,17 +127,17 @@ public class SettingsManager implements WorkgroupChangeListener {
      * Returns the BufferedImage associated with the Workgroup.
      *
      * @param imageName     the name of the image to retrieve.
-     * @param workgroupName the name of the workgroup.
+     * @param workgroupJid the name of the workgroup.
      * @return the BufferedImage
      */
-    public byte[] getImage(String imageName, String workgroupName, ServletContext context) {
-        if (!ModelUtil.hasLength(workgroupName) || "null".equals(workgroupName)) {
+    public byte[] getImage(String imageName, Jid workgroupJid, ServletContext context) {
+        if (workgroupJid == null) {
             WebLog.logError("Workgroup must be specified to retrieve image " + imageName);
             return getBlankImage(context);
         }
         // Handle already populated images.
-        if (chatSettings.containsKey(workgroupName)) {
-            byte[] bytes = getImageFromMap(imageName, workgroupName);
+        if (chatSettings.containsKey(workgroupJid)) {
+            byte[] bytes = getImageFromMap(imageName, workgroupJid);
             if (bytes == null) {
                 return getBlankImage(context);
             }
@@ -142,11 +146,14 @@ public class SettingsManager implements WorkgroupChangeListener {
 
         // Otherwise, retrieve images from private data, store and send.
         XMPPConnection connection = chatManager.getGlobalConnection();
+        ProviderManager.addIQProvider(ChatSettings.ELEMENT_NAME, ChatSettings.NAMESPACE, new ChatSettings.InternalProvider());
+        
         try {
-            Workgroup workgroup = new Workgroup(workgroupName, connection);
+            Workgroup workgroup = new Workgroup(workgroupJid, connection);
             ChatSettings chatSettings = workgroup.getChatSettings();
-            this.chatSettings.put(workgroupName, chatSettings);
-            byte[] imageBytes = getImageFromMap(imageName, workgroupName);
+            WebLog.log("ChatSettings: "+chatSettings.toXML().toString());
+            this.chatSettings.put(workgroupJid, chatSettings);
+            byte[] imageBytes = getImageFromMap(imageName, workgroupJid);
             if (imageBytes == null) {
                 return getBlankImage(context);
             }
@@ -159,8 +166,8 @@ public class SettingsManager implements WorkgroupChangeListener {
         }
     }
 
-    public byte[] getImageFromMap(String imageName, String workgroupName) {
-        ChatSettings chatSettings = (ChatSettings)this.chatSettings.get(workgroupName);
+    public byte[] getImageFromMap(String imageName, Jid workgroupJid) {
+        ChatSettings chatSettings = (ChatSettings)this.chatSettings.get(workgroupJid);
         ChatSetting imageSetting = chatSettings.getChatSetting(imageName);
         if (imageSetting == null || imageSetting.getValue() == null) {
             return null;
@@ -192,9 +199,9 @@ public class SettingsManager implements WorkgroupChangeListener {
     /**
      * If the workgroup has been updated, remove from cache.
      *
-     * @param workgroupName the name of the workgroup updated.
+     * @param workgroupJid the name of the workgroup updated.
      */
-    public void workgroupUpdated(String workgroupName) {
-        chatSettings.remove(workgroupName);
+    public void workgroupUpdated(Jid workgroupJid) {
+        chatSettings.remove(workgroupJid);
     }
 }

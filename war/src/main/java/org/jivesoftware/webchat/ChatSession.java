@@ -12,39 +12,51 @@
 
 package org.jivesoftware.webchat;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Logger;
+
+import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.PresenceListener;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.StanzaListener;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.AndFilter;
+import org.jivesoftware.smack.filter.FromMatchesFilter;
+import org.jivesoftware.smack.filter.StanzaTypeFilter;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.delay.packet.DelayInformation;
+import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jivesoftware.smackx.workgroup.WorkgroupInvitation;
 import org.jivesoftware.smackx.workgroup.WorkgroupInvitationListener;
 import org.jivesoftware.smackx.workgroup.user.Workgroup;
+import org.jivesoftware.smackx.xevent.MessageEventManager;
+import org.jivesoftware.smackx.xevent.MessageEventNotificationListener;
 import org.jivesoftware.webchat.history.Line;
 import org.jivesoftware.webchat.history.Transcript;
 import org.jivesoftware.webchat.personal.ChatMessage;
 import org.jivesoftware.webchat.util.ModelUtil;
 import org.jivesoftware.webchat.util.WebLog;
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.ConnectionListener;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.filter.AndFilter;
-import org.jivesoftware.smack.filter.FromContainsFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.util.StringUtils;
-import org.jivesoftware.smackx.MessageEventManager;
-import org.jivesoftware.smackx.MessageEventNotificationListener;
-import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.smackx.packet.DelayInformation;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import org.jxmpp.jid.EntityBareJid;
+import org.jxmpp.jid.EntityFullJid;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.parts.Resourcepart;
+import org.jxmpp.stringprep.XmppStringprepException;
 
 /**
  * The <code>ChatSession</code> class is responsible for handling all aspects of a chat. Connections, Joining
@@ -52,30 +64,33 @@ import java.util.TimerTask;
  *
  * @author Derek DeMoro
  */
-public class ChatSession implements MessageEventNotificationListener, PacketListener {
-    private XMPPConnection connection;
+public class ChatSession implements MessageEventNotificationListener, StanzaListener {
+  
+  private static Logger logger = Logger.getLogger(ChatSession.class.getName());
+  
+    private XMPPTCPConnection connection;
     private Workgroup workgroup;
     private MultiUserChat groupChat;
 
-    private String name;
-    private List presenceList = new ArrayList();
+    private Resourcepart name;
+    private List<String> presenceList = new ArrayList<>();
 
     private MessageEventManager messageEventManager;
     private boolean composingNotificationsReceived;
-    private Map metadataMap;
+    private Map<String, Object> metadataMap;
 
 
     private Transcript transcript;
 
-    private String nickname;
+    private Resourcepart nickname;
 
     private String emailAddress;
 
-    private String userid;
+    private Jid userid;
 
     private String sessionID;
 
-    private List messageList = new ArrayList();
+    private List<ChatMessage> messageList = new ArrayList<>();
 
     /**
      * The time in milliseconds when the browser last checked for new messages.
@@ -91,24 +106,26 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
 
     final private long createdTimestamp;
     
-    private String roomName;
+    private EntityBareJid roomName;
 
-    private String lastAgent;
+    private Resourcepart lastAgent;
 
     private int port;
     private String host;
 
     /**
-     * Creates a new <code>ChatSession</code>.
+     * Creates a new <code>ChatSession</code>.`
      *
      * @param host         the host to connect to.
      * @param port         the port to connect through.
      * @param useSSL       true if we should SSL with the Connection.
+     * @param userid 
      * @param nickname     the nickname to use during this chat session.
      * @param emailAddress the email address of the user.
+     * @param sessionID 
      * @throws XMPPException
      */
-    public ChatSession(String host, int port, boolean useSSL, String userid, String nickname, String emailAddress, String sessionID) throws XMPPException {
+    public ChatSession(String host, int port, boolean useSSL, Jid userid, Resourcepart nickname, String emailAddress, String sessionID) throws XMPPException {
         this.sessionID = sessionID;
 
         this.host = host;
@@ -125,15 +142,21 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
         this.createdTimestamp = System.currentTimeMillis();
     }
 
-    private boolean connect() throws Exception {
-        if (port == -1 || port == 5222) {
-            connection = new XMPPConnection(host);
-        }
-        else {
-            ConnectionConfiguration config = new ConnectionConfiguration(host, port);
-            connection = new XMPPConnection(config);
-        }
-
+    private boolean connect( boolean anonymous ) throws SmackException, IOException, XMPPException, InterruptedException {
+      
+      XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder()
+           .setSecurityMode(XMPPTCPConnectionConfiguration.SecurityMode.disabled)
+           .setXmppDomain(host)
+           .setHost(host)
+           .setPort(port);
+      
+      if ( anonymous ) {
+        config.performSaslAnonymousAuthentication();
+      }
+      
+      
+        connection = new XMPPTCPConnection(config.build());
+        
         connection.connect();
 
         if (!connection.isConnected()) {
@@ -170,6 +193,14 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
 
             public void reconnectionFailed(Exception exception) {
             }
+
+            @Override
+            public void connected(XMPPConnection connection) {
+            }
+
+            @Override
+            public void authenticated(XMPPConnection connection, boolean resumed) {
+            }
         });
 
         return true;
@@ -180,7 +211,7 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      *
      * @return the current connection used by the user.
      */
-    public XMPPConnection getConnection() {
+    public XMPPTCPConnection getConnection() {
         return connection;
     }
 
@@ -195,16 +226,19 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
 
     /**
      * Logs the user in as an anonymous user.
-     *
+     * @throws InterruptedException 
+     * @throws IOException 
+     * @throws SmackException 
      * @throws XMPPException
+     * @throws FastPathException 
      */
-    public void loginAnonymously() throws Exception {
-        boolean connected = connect();
+    public void loginAnonymously() throws XMPPException, SmackException, IOException, InterruptedException, FastPathException  {
+        boolean connected = connect(true);
         if (connected) {
-            connection.loginAnonymously();
+            connection.login();
         }
         else {
-            throw new Exception("Unable to connect to the server at this time.");
+            throw new FastPathException("Unable to connect to the server at this time.");
         }
     }
 
@@ -213,16 +247,22 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      *
      * @param username the username
      * @param password the password
+     * 
+     * @throws FastPathException 
+     * @throws InterruptedException 
+     * @throws IOException 
+     * @throws SmackException 
+     * @throws XmppStringprepException 
      * @throws XMPPException
      */
-    public void login(String username, String password) throws Exception {
-        boolean connected = connect();
+    public void login(String username, String password) throws FastPathException, XmppStringprepException, XMPPException, SmackException, IOException, InterruptedException {
+        boolean connected = connect(false);
         if (connected) {
-            connection.login(username, password, "Live Assistant Web Client");
-            name = username;
+            connection.login(username, password, Resourcepart.from("Live Assistant Web Client"));
+            name = Resourcepart.from(username);
         }
         else {
-            throw new Exception("Unable to connect to the server at this time.");
+            throw new FastPathException("Unable to connect to the server at this time.");
         }
     }
 
@@ -232,8 +272,11 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      * @param workgroupName the name of the workgroup to join.
      * @param metaData      the metadata associated with this request.
      * @throws XMPPException if an error occurs.
+     * @throws XmppStringprepException 
+     * @throws InterruptedException 
+     * @throws SmackException 
      */
-    public void joinQueue(String workgroupName, Map metaData) throws XMPPException {
+    public void joinQueue(Jid workgroupName, Map<String, Object> metaData) throws XMPPException, XmppStringprepException, SmackException, InterruptedException {
         // Never have null values in metadata
         if (metaData.containsValue(null)) {
             WebLog.logError("You cannot have null values in the Metadata.");
@@ -243,7 +286,7 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
 
         workgroup.addInvitationListener(new WorkgroupInvitationListener() {
             public void invitationReceived(WorkgroupInvitation workgroupInvitation) {
-                String room = workgroupInvitation.getGroupChatName();
+                EntityBareJid room = workgroupInvitation.getGroupChatName().asEntityBareJidIfPossible();
                 joinRoom(room);
             }
         });
@@ -260,11 +303,11 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
 
         // If metadata about the users name is present, use it to set the name.
         if (metaData.containsKey("username")) {
-            name = (String)metaData.get("username");
+            name = Resourcepart.from((String)metaData.get("username"));
         }
 
         if (name == null) {
-            name = "Visitor";
+            name = Resourcepart.from("Visitor");
         }
 
         metadataMap = metaData;
@@ -318,9 +361,9 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
     }
 
     /**
-     * Check to see if the <code>XMPPConnection</code> has been closed.
+     * Check to see if the <code>XMPPTCPConnection</code> has been closed.
      *
-     * @return true if the <code>XMPPConnection</code> has been closed.
+     * @return true if the <code>XMPPTCPConnection</code> has been closed.
      */
     public boolean isClosed() {
         return connection == null || !connection.isConnected();
@@ -352,13 +395,18 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
                 workgroup.departQueue();
                 workgroup = null;
             }
-            catch (XMPPException xe) {
+            catch (XMPPException | NoResponseException | NotConnectedException | InterruptedException xe) {
                 WebLog.logError("Error closing ChatSession:", xe);
             }
         }
         // If we've already been routed and are in a chat, leave it.
         if (groupChat != null) {
-            groupChat.leave();
+            try {
+              groupChat.leave();
+            } catch (NotConnectedException | InterruptedException e) {
+              WebLog.logError("Error closing ChatSession:", e);
+              
+            }
             groupChat = null;
 
             if (messageEventManager != null) {
@@ -379,45 +427,53 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      *
      * @param roomName the name of the room to join.
      */
-    public void joinRoom(String roomName) {
+    public void joinRoom(EntityBareJid roomName) {
         // Set the last check now
         lastCheck = System.currentTimeMillis();
 
         try {
-            groupChat = new MultiUserChat(connection, roomName);
+            MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
+            groupChat = manager.getMultiUserChat(roomName);
             if (name != null) {
                 try {
-                    AndFilter presenceFilter = new AndFilter(new PacketTypeFilter(Presence.class), new FromContainsFilter(groupChat.getRoom()));
-                    connection.addPacketListener(this, presenceFilter);
+                    AndFilter presenceFilter = new AndFilter(new StanzaTypeFilter(Presence.class), FromMatchesFilter.create(groupChat.getRoom()));
+                    connection.addAsyncStanzaListener(this, presenceFilter);
                     groupChat.join(name);
                 }
                 // Catch any join exceptions and attempt to join again
                 // using an altered name (since exception is most likely
                 // due to a conflict of names).
                 catch (XMPPException xe) {
-                    String conflictName = name + " (Visitor)";
+                    Resourcepart conflictName = Resourcepart.from(name + " (Visitor)");
                     groupChat.join(conflictName);
                     nickname = conflictName;
                 }
             }
             else {
-                nickname = "Visitor";
+                nickname = Resourcepart.from("Visitor");
                 groupChat.join(nickname);
             }
-            groupChat.addParticipantListener(new PacketListener() {
-                public void processPacket(Packet packet) {
-                    final Presence p = (Presence)packet;
-                    final String from = p.getFrom();
-                    String user = StringUtils.parseResource(from);
+            groupChat.addParticipantListener(new PresenceListener() {
+              
+              @Override
+              public void processPresence(Presence presence) {
 
-                    if (p.getType() != Presence.Type.available) {
-                        lastAgent = user;
-                    }
+                final Jid from = presence.getFrom();
+                Resourcepart user = from.getResourceOrEmpty();
+                
+                if (presence.getType() != Presence.Type.available) {
+                  lastAgent = user;
+                }
 
                     final Timer timer = new Timer();
                     timer.schedule(new TimerTask() {
                         public void run() {
-                            checkForEmptyRoom();
+                            try {
+                              checkForEmptyRoom();
+                            } catch (NotConnectedException | InterruptedException e) {
+                              logger.fine("checkForEmptyRoom:" + e.getMessage());
+                              
+                            }
                         }
                     }, 5000);
 
@@ -425,7 +481,7 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
                 }
             });
 
-            messageEventManager = new MessageEventManager(connection);
+            messageEventManager = MessageEventManager.getInstanceFor(connection);
             messageEventManager.addMessageEventNotificationListener(this);
         }
         catch (Exception e) {
@@ -436,14 +492,14 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
         listenForMessages(connection, groupChat);
     }
 
-    private void checkForEmptyRoom() {
+    private void checkForEmptyRoom() throws NotConnectedException, InterruptedException {
         // See if we are the last one in the chat room.
         if (groupChat.getOccupantsCount() == 1) {
             // Leave the room.
             groupChat.leave();
             groupChat = null;
             // Cancel this listener.
-            connection.removePacketListener(this);
+            connection.removeAsyncStanzaListener(this);
             // Close the connection.
             connection.disconnect();
             connection = null;
@@ -455,7 +511,7 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      *
      * @return messageList
      */
-    public List getMessageList() {
+    public List<ChatMessage> getMessageList() {
         lastCheck = System.currentTimeMillis();
         inactivityWarningSent = false; // OF-508: reset the flag that determines if inactivity warnings are to be send.
         return messageList;
@@ -491,7 +547,8 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      * @param from     who is delievering the message.
      * @param packetID the id of the packet.
      */
-    public void deliveredNotification(String from, String packetID) {
+    @Override
+    public void deliveredNotification(Jid from, String packetID) {
     }
 
     /**
@@ -500,7 +557,8 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      * @param from     who is delievering the message.
      * @param packetID the id of the packet.
      */
-    public void displayedNotification(String from, String packetID) {
+    @Override
+    public void displayedNotification(Jid from, String packetID) {
     }
 
     /**
@@ -510,20 +568,24 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      * @param from     who is composing the message.
      * @param packetID the id of the packet.
      */
-    public void composingNotification(String from, String packetID) {
+    @Override
+    public void composingNotification(Jid from, String packetID) {
         composingNotificationsReceived = true;
     }
 
-    public void offlineNotification(String from, String packetID) {
+    @Override
+    public void offlineNotification(Jid from, String packetID) {
     }
 
-    public void cancelledNotification(String from, String packetID) {
+    @Override
+    public void cancelledNotification(Jid from, String packetID) {
     }
 
-    public void processPacket(Packet packet) {
+    @Override
+    public void processStanza(Stanza packet) {
         final Presence p = (Presence)packet;
-        final String from = p.getFrom();
-        String user = StringUtils.parseResource(from);
+        final Jid from = p.getFrom();
+        Resourcepart user = from.getResourceOrEmpty();
 
         if (p.getType() == Presence.Type.available) {
             int count = groupChat==null?0:groupChat.getOccupantsCount();
@@ -548,7 +610,7 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      *
      * @return the <code>List</code> of all Presence updates within the conversation.
      */
-    public List getPresenceList() {
+    public List<String> getPresenceList() {
         return presenceList;
     }
 
@@ -558,15 +620,13 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      *
      * @return the nickname of the agent who has joined the room.
      */
-    public String getInitialAgent() {
-        String agent = null;
+    public Resourcepart getInitialAgent() {
+      Resourcepart agent = null;
 
         for (int i = 0; i < 10; i++) {
             if (groupChat != null) {
-                Iterator iter = groupChat.getOccupants();
-                while (iter.hasNext()) {
-                    String occupant = (String)iter.next();
-                    String user = StringUtils.parseResource(occupant);
+                for( EntityFullJid occupant : groupChat.getOccupants() ) {
+                    Resourcepart user = occupant.getResourceOrEmpty();
                     if (!user.equals(name)) {
                         agent = user;
                         break;
@@ -620,7 +680,7 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      *
      * @return the nickname used in this chat.
      */
-    public String getNickname() {
+    public Resourcepart getNickname() {
         return nickname;
     }
 
@@ -631,7 +691,7 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      *
      * @return the metadata associated with this chat.
      */
-    public Map getMetaData() {
+    public Map<String, Object> getMetaData() {
         return metadataMap;
     }
 
@@ -663,18 +723,18 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
     }
 
 
-    public void listenForMessages(final XMPPConnection con, MultiUserChat chat) {
-        PacketListener packetListener = new PacketListener() {
-            public void processPacket(Packet packet) {
-                Message message = (Message)packet;
+    public void listenForMessages(final XMPPTCPConnection con, MultiUserChat chat) {
+        MessageListener packetListener = new MessageListener() {
+            public void processMessage(Message message) {
                 if (ModelUtil.hasLength(message.getBody())) {
                     ChatMessage chatMessage = new ChatMessage(message);
-                    String from = StringUtils.parseResource(message.getFrom());
-                    if (from.equalsIgnoreCase(nickname)) {
+                    Resourcepart from = message.getFrom().getResourceOrEmpty();
+                    
+                    if (from.equals(nickname)) {
                         return;
                     }
                     String body = message.getBody();
-                    chatMessage.setFrom(from);
+                    chatMessage.setFrom(from.toString());
                     chatMessage.setBody(body);
 
 
@@ -711,7 +771,7 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      * @return the question asked by the visitor.
      */
     public String getQuestion() {
-        final Map map = getMetaData();
+        final Map<String, Object> map = getMetaData();
         String question = "";
         if (map.containsKey(("Question"))) {
             question = "Question: " + (String)map.get("Question");
@@ -724,11 +784,11 @@ public class ChatSession implements MessageEventNotificationListener, PacketList
      *
      * @return the name of the MultiUserChat room.
      */
-    public String getRoomName() {
+    public EntityBareJid getRoomName() {
         return roomName;
     }
 
-    public String getLastAgentInRoom() {
+    public Resourcepart getLastAgentInRoom() {
         return lastAgent;
     }
 

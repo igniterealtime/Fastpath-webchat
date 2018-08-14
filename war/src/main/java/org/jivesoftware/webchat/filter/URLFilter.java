@@ -40,7 +40,7 @@ public class URLFilter {
         // Not instantiable.
     }
 
-    private static List PROTOCOLS = new ArrayList();
+    private static List<String> PROTOCOLS = new ArrayList<>();
 
     static {
         PROTOCOLS.add("http://");
@@ -61,7 +61,7 @@ public class URLFilter {
 
         int length = string.length();
         StringBuffer filtered = new StringBuffer((int) (length * 1.5));
-        ArrayList urlBlocks = new ArrayList(5);
+        List<URLBlock> urlBlocks = new ArrayList<>(5);
 
         // search for url's such as [url=..]text[/url] or [url ..]text[/url]
         int start = string.indexOf("[url");
@@ -115,10 +115,10 @@ public class URLFilter {
         }
 
         // now handle all the other urls
-        Iterator iter = PROTOCOLS.iterator();
+        Iterator<String> iter = PROTOCOLS.iterator();
 
         while (iter.hasNext()) {
-            String scheme = (String) iter.next();
+            String scheme = iter.next();
             start = string.indexOf(scheme, 0);
 
             while (start != -1) {
@@ -230,11 +230,11 @@ public class URLFilter {
         sortBlocks(urlBlocks);
 
         // now, markup the urls and pass along the filter chain the rest
-        Iterator blocks = urlBlocks.iterator();
+        Iterator<URLBlock> blocks = urlBlocks.iterator();
         int last = 0;
 
         while (blocks.hasNext()) {
-            URLBlock block = (URLBlock) blocks.next();
+            URLBlock block = blocks.next();
 
             if (block.getStart() > 0) {
                 filtered.append(string.substring(last, block.getStart()));
@@ -286,28 +286,26 @@ public class URLFilter {
         }
 
         // empty the current list
-        this.PROTOCOLS.clear();
+        PROTOCOLS.clear();
 
         StringTokenizer st = new StringTokenizer(schemes, ",");
 
         while (st.hasMoreElements()) {
-            this.PROTOCOLS.add(st.nextElement());
+            PROTOCOLS.add(st.nextToken());
         }
     }
 
-    private static void sortBlocks(ArrayList blocks) {
-        Collections.sort(blocks, new Comparator() {
-            public int compare(Object object1, Object object2) {
-                URLBlock b1 = (URLBlock) object1;
-                URLBlock b2 = (URLBlock) object2;
+    private static void sortBlocks(List<URLBlock> blocks) {
+        Collections.sort(blocks, new Comparator<URLBlock>() {
+            public int compare(URLBlock b1, URLBlock b2) {
                 return (b1.getStart() > b2.getStart()) ? 1 : -1;
             }
         });
     }
 
-    private static boolean withinAnotherBlock(List blocks, int start) {
+    private static boolean withinAnotherBlock(List<URLBlock> blocks, int start) {
         for (int i = 0; i < blocks.size(); i++) {
-            URLBlock block = (URLBlock) blocks.get(i);
+            URLBlock block = blocks.get(i);
 
             if (start >= block.getStart() && start < block.getEnd()) {
                 return true;
@@ -321,54 +319,37 @@ public class URLFilter {
      * Encapsulates a URL and link.
      */
     private static class URLBlock {
-        int start = 0;
-        int end = 0;
-        String description = "";
-        String url = "";
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-
-        public void setUrl(String url) {
-            this.url = url;
-        }
-
-        URLBlock(int start, int end, String url) {
-            this.start = start;
-            this.end = end;
-            this.url = url;
-        }
-
-        URLBlock(int start, int end, String url, String description) {
-            this.start = start;
-            this.end = end;
-            this.description = description;
-            this.url = url;
-        }
-
-        public int getStart() {
-            return start;
-        }
-
-        public void setStart(int start) {
-            this.start = start;
-        }
-
-        public int getEnd() {
-            return end;
-        }
-
-        public void setEnd(int end) {
-            this.end = end;
-        }
+      final int start;
+      final int end;
+      final String description;
+      final String url;
+  
+      URLBlock(int start, int end, String url) {
+        this(start, end, url, "");
+      }
+  
+      URLBlock(int start, int end, String url, String description) {
+        this.start = start;
+        this.end = end;
+        this.description = description;
+        this.url = url;
+      }
+  
+      public String getDescription() {
+        return description;
+      }
+  
+      public String getUrl() {
+        return url;
+      }
+  
+      public int getStart() {
+        return start;
+      }
+  
+      public int getEnd() {
+        return end;
+      }
+  
     }
 }

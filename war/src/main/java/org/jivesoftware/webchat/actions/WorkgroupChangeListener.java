@@ -10,6 +10,8 @@
  */
 package org.jivesoftware.webchat.actions;
 
+import org.jxmpp.jid.Jid;
+
 /* RCSFile: $
  * Revision: $
  * Date: $
@@ -22,5 +24,5 @@ package org.jivesoftware.webchat.actions;
 
 public interface WorkgroupChangeListener {
 
-    void workgroupUpdated(String workgroupName);
+    void workgroupUpdated(Jid jid);
 }

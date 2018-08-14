@@ -46,6 +46,9 @@ public final class ModelUtil {
      * {@link java.util.Arrays} should be used instead of this method.
      * Note that arrays with more than one dimension will require some
      * custom code in order to implement <CODE>equals</CODE> properly.
+     * @param o1 
+     * @param o2 
+     * @return 
      */
     public static final boolean areEqual(Object o1, Object o2) {
         if (o1 == o2) {
@@ -71,6 +74,9 @@ public final class ModelUtil {
      * </OL>
      * <p/>
      * This method produces the exact logically inverted result as the
+     * @param b1 
+     * @param b2 
+     * @return 
      */
     public static final boolean areBooleansEqual(Boolean b1, Boolean b2) {
         // !jwetherb treat NULL the same as Boolean.FALSE
@@ -98,6 +104,9 @@ public final class ModelUtil {
      * {@link java.util.Arrays} should be used instead of this method.
      * Note that arrays with more than one dimension will require some
      * custom code in order to implement <CODE>equals</CODE> properly.
+     * @param o1 
+     * @param o2 
+     * @return 
      */
     public static final boolean areDifferent(Object o1, Object o2) {
         return !areEqual(o1, o2);
@@ -117,6 +126,9 @@ public final class ModelUtil {
      * <p/>
      * This method produces the exact logically inverted result as the
      * {@link #areBooleansEqual(Boolean, Boolean)} method.<P>
+     * @param b1 
+     * @param b2 
+     * @return 
      */
     public static final boolean areBooleansDifferent(Boolean b1, Boolean b2) {
         return !areBooleansEqual(b1, b2);
@@ -127,6 +139,8 @@ public final class ModelUtil {
      * Returns <CODE>true</CODE> if the specified array is not null
      * and contains a non-null element.  Returns <CODE>false</CODE>
      * if the array is null or if all the array elements are null.
+     * @param array 
+     * @return 
      */
     public static final boolean hasNonNullElement(Object[] array) {
         if (array != null) {
@@ -147,6 +161,8 @@ public final class ModelUtil {
      * are skipped.  If the array itself is null, the empty string
      * is returned.  This method is guaranteed to return a non-null
      * value, if no expections are thrown.
+     * @param strs 
+     * @return 
      */
     public static final String concat(String[] strs) {
         return concat(strs, " ");  //NOTRANS
@@ -157,8 +173,12 @@ public final class ModelUtil {
      * strings in the specified string array.  The strings are separated
      * by the specified delimiter.  Null array elements are skipped.  If
      * the array itself is null, the empty string is returned.  This
-     * method is guaranteed to return a non-null value, if no expections
+     * method is guaranteed to return a non-null value, if no exceptions
      * are thrown.
+     * 
+     * @param strs 
+     * @param delim 
+     * @return 
      */
     public static final String concat(String[] strs, String delim) {
         if (strs != null) {
@@ -186,6 +206,8 @@ public final class ModelUtil {
      * Returns <CODE>true</CODE> if the specified {@link String} is not
      * <CODE>null</CODE> and has a length greater than zero.  This is
      * a very frequently occurring check.
+     * @param s 
+     * @return 
      */
     public static final boolean hasLength(String s) {
         return (s != null && s.length() > 0);
@@ -195,6 +217,8 @@ public final class ModelUtil {
      * Returns <CODE>true</CODE> if the specified {@link String} is not
      * <CODE>null</CODE> and has a length greater than zero when string has
      * been trimmed.  This is a very frequently occurring check.
+     * @param s 
+     * @return 
      */
     public static final boolean hasTrimmedLength(String s) {
         return (s != null && s.trim().length() > 0);
@@ -203,6 +227,8 @@ public final class ModelUtil {
     /**
      * Returns <CODE>true</CODE> if the specified {@link String} is not
      * <CODE>null</CODE> and is true
+     * @param s 
+     * @return 
      */
     public static final boolean isTrue(String s) {
         return (hasLength(s) && s.equals("true"));
@@ -212,6 +238,8 @@ public final class ModelUtil {
     /**
      * Returns <CODE>null</CODE> if the specified string is empty or
      * <CODE>null</CODE>.  Otherwise the string itself is returned.
+     * @param s 
+     * @return 
      */
     public static final String nullifyIfEmpty(String s) {
         return ModelUtil.hasLength(s) ? s : null;
@@ -222,6 +250,8 @@ public final class ModelUtil {
      * or if its <CODE>toString()</CODE> representation is empty.
      * Otherwise, the <CODE>toString()</CODE> representation of the
      * object itself is returned.
+     * @param o 
+     * @return 
      */
     public static final String nullifyingToString(Object o) {
         return o != null ? nullifyIfEmpty(o.toString()) : null;
@@ -230,6 +260,7 @@ public final class ModelUtil {
     /**
      * Returns an empty string if null.
      * @param string the string to check.
+     * @return 
      */
     public static final String emptyStringIfNull(String string){
         if(!hasLength(string)){
@@ -262,9 +293,11 @@ public final class ModelUtil {
 
     /**
      * Build a List of all elements in an Iterator.
+     * @param i 
+     * @return 
      */
-    public static List iteratorAsList(Iterator i) {
-        ArrayList list = new ArrayList(10);
+    public static <T> List<T> iteratorAsList(Iterator<T> i) {
+        List<T> list = new ArrayList<>(10);
         while (i.hasNext()) {
             list.add(i.next());
         }
@@ -273,19 +306,21 @@ public final class ModelUtil {
 
     /**
      * Creates an Iterator that is the reverse of a ListIterator.
+     * @param i 
+     * @return 
      */
-    public static Iterator reverseListIterator(ListIterator i) {
-        return new ReverseListIterator(i);
+    public static <T> Iterator<T> reverseListIterator(ListIterator<T> i) {
+        return new ReverseListIterator<T>(i);
     }
 }
 
 /**
  * An Iterator that is the reverse of a ListIterator.
  */
-class ReverseListIterator implements Iterator {
-    private ListIterator _i;
+class ReverseListIterator<T> implements Iterator<T> {
+    private ListIterator<T> _i;
 
-    ReverseListIterator(ListIterator i) {
+    ReverseListIterator(ListIterator<T> i) {
         _i = i;
         while (_i.hasNext())
             _i.next();
@@ -295,7 +330,7 @@ class ReverseListIterator implements Iterator {
         return _i.hasPrevious();
     }
 
-    public Object next() {
+    public T next() {
         return _i.previous();
     }
 

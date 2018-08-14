@@ -1,24 +1,39 @@
 package org.jivesoftware.webchat;
 
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
+import javax.swing.JFrame;
+
+import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smackx.muc.InvitationListener;
+import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.MultiUserChatManager;
+import org.jivesoftware.smackx.muc.packet.MUCUser.Invite;
 import org.jivesoftware.smackx.workgroup.MetaData;
 import org.jivesoftware.smackx.workgroup.agent.AgentSession;
 import org.jivesoftware.smackx.workgroup.agent.Offer;
 import org.jivesoftware.smackx.workgroup.agent.OfferListener;
 import org.jivesoftware.smackx.workgroup.agent.RevokedOffer;
-import org.jivesoftware.smack.*;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smackx.muc.InvitationListener;
-import org.jivesoftware.smackx.muc.MultiUserChat;
-import javax.swing.JFrame;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TimeZone;
+import org.jxmpp.jid.EntityJid;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.jid.parts.Resourcepart;
 
 public class LoadTest {
 
@@ -31,9 +46,9 @@ public class LoadTest {
         int i = 0;
         for (int j = 0; j < 1000; j++) {
             try {
-                Iterator iter = sm.getChatSessions().iterator();
+                Iterator<ChatSession> iter = sm.getChatSessions().iterator();
                 while (iter.hasNext()) {
-                    ChatSession session = (ChatSession)iter.next();
+                    ChatSession session = iter.next();
                     if (session.isInGroupChat()) {
                         session.getGroupChat().sendMessage("Howdy");
                     }
@@ -44,10 +59,11 @@ public class LoadTest {
 
                 i++;
 
-
-                ChatSession chatSession = new ChatSession(SERVER, -1, false, "dd", "DON JUAN", "don@juan.com", "ddfdfd");
+                Jid jid = JidCreate.from("dd");
+                Resourcepart res = Resourcepart.from("DON JUAN");
+                ChatSession chatSession = new ChatSession(SERVER, -1, false, jid , res , "don@juan.com", "ddfdfd");
                 // Gather all meta-data.
-                final Map metaData = new HashMap();
+                final Map<String, Object> metaData = new HashMap<>();
                 metaData.put("Name", "DON");
 
                 metaData.put("User Agent", "Mozilla");
@@ -70,7 +86,8 @@ public class LoadTest {
 
                 sm.addChatSession("" + i, chatSession);
                 chatSession.loginAnonymously();
-                chatSession.joinQueue("demo@workgroup."+SERVER, metaData);
+                Jid agentJid = JidCreate.from("demo@workgroup."+SERVER);
+                chatSession.joinQueue(agentJid, metaData);
             }
             catch (Exception ex) {
                 ex.printStackTrace();
@@ -86,45 +103,68 @@ public class LoadTest {
         SERVER = args[0];
 
         new LoadTest();
+        
         new JFrame().setVisible(true);
     }
 
     private void connectAsAgent() {
         try {
-            final XMPPConnection con = new XMPPConnection(SERVER);
-            con.login("jive", "user", "demo");
+            final XMPPTCPConnection con = new XMPPTCPConnection("jive", "user",SERVER);
+            con.login("jive", "user", Resourcepart.from("demo"));
 
+            Jid agentJid = JidCreate.from("demo@workgroup."+SERVER);
             // Notify workgroup that the agent is here
-            AgentSession agentSession = new AgentSession("demo@workgroup."+SERVER, con);
+            AgentSession agentSession = new AgentSession(agentJid, con);
             agentSession.setOnline(true);
             agentSession.setStatus(Presence.Mode.available, 10, "available");
 
 
             con.addConnectionListener(new ConnectionListener() {
-                public void connectionClosed() {
-                    System.out.println("Connection is closed");
-                }
-
-                public void connectionClosedOnError(Exception e) {
-                    System.out.println("Connection closed with an error: " + e);
-                }
-
-
-                public void reconnectingIn(int i) {
-                }
-
-                public void reconnectionSuccessful() {
-                }
-
-                public void reconnectionFailed(Exception exception) {
-                }
+              @Override
+              public void connectionClosed() {
+                System.out.println("Connection is closed");
+              }
+      
+              @Override
+              public void connectionClosedOnError(Exception e) {
+                System.out.println("Connection closed with an error: " + e);
+              }
+      
+              @Override
+              public void reconnectingIn(int i) {
+              }
+      
+              @Override
+              public void reconnectionSuccessful() {
+              }
+      
+              @Override
+              public void reconnectionFailed(Exception exception) {
+              }
+      
+              @Override
+              public void connected(XMPPConnection connection) {
+                System.out.println("connected");
+      
+              }
+      
+              @Override
+              public void authenticated(XMPPConnection connection, boolean resumed) {
+                System.out.println("authenticated");
+      
+              }
             });
 
             // Add Offer Listener
             agentSession.addOfferListener(new OfferListener() {
                 public void offerReceived(Offer offer) {
-                    offer.accept();
-                    System.out.println("offer accepted " + offer.getSessionID());
+                    try {
+                      offer.accept();
+                      System.out.println("offer accepted " + offer.getSessionID());
+                    } catch (NotConnectedException | InterruptedException e) {
+                      System.out.println("offer not accepted " + e.getLocalizedMessage());
+                      
+                    }
                 }
 
                 public void offerRevoked(RevokedOffer revokedOffer) {
@@ -133,33 +173,36 @@ public class LoadTest {
             });
 
             // Listen for Room Invitation from Server
-            MultiUserChat.addInvitationListener(con, new InvitationListener() {
-                public void invitationReceived(XMPPConnection conn, String room, String inviter, String reason, String password, Message message) {
+            MultiUserChatManager.getInstanceFor(con).addInvitationListener(new InvitationListener() {
+              @Override
+              public void invitationReceived(XMPPConnection conn, MultiUserChat groupChat, EntityJid inviter, String reason, String password,
+                  Message message, Invite invitation) {
 
-                    Map metaData = new HashMap();
+                    Map<String, List<String>>  metaData = new HashMap<>();
                     MetaData metaDataExt = (MetaData)message.getExtension(MetaData.ELEMENT_NAME, MetaData.NAMESPACE);
                     if (metaDataExt != null) {
                         metaData = metaDataExt.getMetaData();
                     }
                     System.out.println("Creating room for sessionID " + reason);
-                    metaData.put("inviter", inviter);
+                    metaData.put("inviter", Collections.singletonList(inviter.toString()));
 
-                    MultiUserChat groupChat = new MultiUserChat(con, room);
-                    groupChat.addMessageListener(new PacketListener() {
-                        public void processPacket(Packet packet) {
-                            System.out.println(((Message)packet).getBody());
+                    //MultiUserChat groupChat = MultiUserChatManager.getInstanceFor(connection) new MultiUserChat(con, room);
+                    groupChat.addMessageListener(new MessageListener() {
+                        public void processMessage(Message packet) {
+                            System.out.println(packet.getBody());
                         }
                     });
                 }
 
-                @Override
-                public void invitationReceived(Connection conn, String room, String inviter, String reason, String password, Message message) {
-                    throw new UnsupportedOperationException();
-                }
+//                @Override
+//                public void invitationReceived(XMPPConnection conn, String room, String inviter, String reason, String password, Message message) {
+//                    throw new UnsupportedOperationException();
+//                }
+
             });
 
         }
-        catch (XMPPException e) {
+        catch (XMPPException | SmackException | InterruptedException | IOException e) {
             e.printStackTrace();
         }
     }

@@ -19,6 +19,7 @@
         <!-- Versions -->
         <!-- Note; the following jetty.version should be identical to the jetty.version in plugins/pom.xml -->
     <jetty.version>9.4.11.v20180605</jetty.version>
+    <smack.version>4.2.3</smack.version>
     <plugin.name>webchat</plugin.name>
   </properties>
 

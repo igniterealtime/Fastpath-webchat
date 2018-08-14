@@ -19,6 +19,7 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -745,7 +746,7 @@ public class StringUtils {
             return new String[0];
         }
 
-        ArrayList wordList = new ArrayList();
+        List<String> wordList = new ArrayList<>();
         BreakIterator boundary = BreakIterator.getWordInstance();
         boundary.setText(text);
         int start = 0;

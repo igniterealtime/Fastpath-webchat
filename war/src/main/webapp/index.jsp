@@ -64,8 +64,8 @@
         <table cellspacing="0" cellpadding="4" border="0">
         <tbody>
             <% int count = 1;
-                Collection workgroupList = null;
-                Iterator workgroups = null;
+                Collection<String> workgroupList = null;
+                Iterator<String> workgroups = null;
                 try {
                     workgroupList = WorkgroupStatus.getWorkgroupNames();
                     workgroups = workgroupList.iterator();
@@ -74,7 +74,7 @@
                     e.printStackTrace();
                 }
                 while (workgroups != null && workgroups.hasNext()) {
-                    String workgroupName = (String)workgroups.next();
+                    String workgroupName = workgroups.next();
             %>
                 <tr>
                     <td><%= count++ %>. </td>

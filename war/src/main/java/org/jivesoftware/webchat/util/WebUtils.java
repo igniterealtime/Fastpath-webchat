@@ -12,13 +12,12 @@
 
 package org.jivesoftware.webchat.util;
 
+import java.util.Date;
+
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.webchat.filter.EmoticonFilter;
 import org.jivesoftware.webchat.filter.TextStyleFilter;
 import org.jivesoftware.webchat.filter.URLFilter;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Presence;
-
-import java.util.Date;
 
 /**
  * The <code>WebUtils</code> class is a utility class for some of the most
@@ -173,16 +172,16 @@ public final class WebUtils {
         return urlToPush;
     }
 
-    /**
-     * Returns the nickname of the user who sent the message.
-     *
-     * @param message the message sent.
-     * @return the nickname of the user who sent the message.
-     */
-    public static String getNickname(Message message) {
-        String from = org.jivesoftware.smack.util.StringUtils.parseResource(message.getFrom());
-        return from;
-    }
+//    /**
+//     * Returns the nickname of the user who sent the message.
+//     *
+//     * @param message the message sent.
+//     * @return the nickname of the user who sent the message.
+//     */
+//    public static String getNickname(Message message) {
+//        String from = org.jivesoftware.smack.util.StringUtils.parseResource(message.getFrom());
+//        return from;
+//    }
 
     /**
      * Returns better looking time String.

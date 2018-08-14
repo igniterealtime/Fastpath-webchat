@@ -6,7 +6,6 @@
     <groupId>org.igniterealtime.openfire.fastpath</groupId>
     <version>2.6.2</version>
   </parent>
-  <groupId>org.igniterealtime.openfire.fastpath</groupId>
   <artifactId>webchat-plugin</artifactId>
   <name>Fastpath Webchat plugin</name>
   <description>Web based chat client for Fastpath Openfire-Plugin</description>

@@ -13,8 +13,8 @@
 <%@ page import="org.jivesoftware.webchat.util.FormText,
                  org.jivesoftware.webchat.util.ParamUtils" %>
 <%@ page errorPage="fatal.jsp" %>
-<script type='text/javascript' src='<%= request.getContextPath()%>/dwr/interface/room.js'></script>
 <script type='text/javascript' src='<%= request.getContextPath()%>/dwr/engine.js'></script>
+<script type='text/javascript' src='<%= request.getContextPath()%>/dwr/interface/room.js'></script>
 <%
     final String workgroup = ParamUtils.getParameter(request, "workgroup");
     final String chatID = ParamUtils.getParameter(request, "chatID");
@@ -27,7 +27,7 @@
         <link rel="stylesheet" type="text/css" href="style.jsp?workgroup=<%= workgroup %>"/>
         <script language="JavaScript" type="text/javascript" src="common.js"></script>
         <script type="text/javascript" language="Javascript">
-         DWREngine.setErrorHandler(handleError);
+        dwr.engine.setErrorHandler(handleError);
 
 
          function handleError(error) {

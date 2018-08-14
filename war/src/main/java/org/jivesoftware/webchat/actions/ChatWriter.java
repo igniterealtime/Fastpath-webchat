@@ -12,16 +12,16 @@
 
 package org.jivesoftware.webchat.actions;
 
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.xevent.MessageEventManager;
 import org.jivesoftware.webchat.ChatSession;
 import org.jivesoftware.webchat.util.WebLog;
 import org.jivesoftware.webchat.util.WebUtils;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.util.StringUtils;
-import org.jivesoftware.smackx.MessageEventManager;
-import org.jivesoftware.smackx.muc.MultiUserChat;
-
-import java.util.Iterator;
+import org.jxmpp.jid.EntityBareJid;
+import org.jxmpp.jid.EntityFullJid;
+import org.jxmpp.jid.parts.Resourcepart;
 
 /**
  * Responsible for sending messages to all parties in a ChatRoom. The
@@ -61,20 +61,20 @@ public final class ChatWriter {
 
                 // update the transcript:
                 String body = WebUtils.applyFilters(message);
-                String nickname = chat.getNickname();
-                chatSession.updateTranscript(nickname, body);
+                Resourcepart nickname = chat.getNickname();
+                chatSession.updateTranscript(nickname.toString(), body);
 
                 if (chat != null) {
                     final Message chatMessage = new Message();
                     chatMessage.setType(Message.Type.groupchat);
                     chatMessage.setBody(message);
 
-                    String room = chat.getRoom();
+                    EntityBareJid room = chat.getRoom();
                     chatMessage.setTo(room);
                     chat.sendMessage(chatMessage);
                 }
             }
-            catch (XMPPException e) {
+            catch ( NotConnectedException | InterruptedException e) {
                 WebLog.logError("Error sending message:", e);
             }
         }
@@ -82,14 +82,15 @@ public final class ChatWriter {
 
     /**
      * Notifies all MessageEventHandlers that the customer is typing a message.
+     * @throws InterruptedException 
+     * @throws NotConnectedException 
      */
-    public void customerIsTyping() {
+    public void customerIsTyping() throws NotConnectedException, InterruptedException {
         final MultiUserChat chat = chatSession.getGroupChat();
-        final Iterator iter = chat.getOccupants();
-        while (iter.hasNext()) {
-            String from = (String) iter.next();
-            String tFrom = StringUtils.parseResource(from);
-            String nickname = chat.getNickname();
+            
+        for ( EntityFullJid from : chat.getOccupants() ) {    
+            Resourcepart tFrom = from.getResourceOrNull();
+            Resourcepart nickname = chat.getNickname();
             if (tFrom != null && !tFrom.equals(nickname)) {
                 MessageEventManager messageEventManager = chatSession.getMessageEventManager();
                 messageEventManager.sendComposingNotification(from, "l0k1");

@@ -11,20 +11,24 @@
  */
 package org.jivesoftware.webchat;
 
+import java.util.List;
+
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.XMPPException.XMPPErrorException;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.workgroup.user.Workgroup;
+import org.jivesoftware.smackx.xevent.MessageEventManager;
 import org.jivesoftware.webchat.actions.ChatQueue;
 import org.jivesoftware.webchat.personal.ChatMessage;
 import org.jivesoftware.webchat.util.FormText;
 import org.jivesoftware.webchat.util.WebLog;
 import org.jivesoftware.webchat.util.WebUtils;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.util.StringUtils;
-import org.jivesoftware.smackx.MessageEventManager;
-import org.jivesoftware.smackx.muc.MultiUserChat;
-
-import java.util.Iterator;
-import java.util.List;
+import org.jxmpp.jid.EntityBareJid;
+import org.jxmpp.jid.EntityFullJid;
+import org.jxmpp.jid.parts.Resourcepart;
+import org.jxmpp.stringprep.XmppStringprepException;
 
 /**
  * ChatUtils handles basic messaging functionallity, including
@@ -47,7 +51,7 @@ public class ChatUtils {
             return null;
         }
 
-        List messages = chatSession.getMessageList();
+        List<ChatMessage> messages = chatSession.getMessageList();
         ChatMessage[] m = (ChatMessage[])messages.toArray(new ChatMessage[messages.size()]);
         chatSession.getMessageList().clear();
         return m;
@@ -86,20 +90,20 @@ public class ChatUtils {
 
                 // update the transcript:
                 String body = WebUtils.applyFilters(message);
-                String nickname = chat.getNickname();
-                chatSession.updateTranscript(nickname, body);
+                Resourcepart nickname = chat.getNickname();
+                chatSession.updateTranscript(nickname.toString(), body);
 
                 if (chat != null) {
                     final Message chatMessage = new Message();
                     chatMessage.setType(Message.Type.groupchat);
                     chatMessage.setBody(message);
 
-                    String room = chat.getRoom();
+                    EntityBareJid room = chat.getRoom();
                     chatMessage.setTo(room);
                     chat.sendMessage(chatMessage);
                 }
             }
-            catch (XMPPException e) {
+            catch (NotConnectedException | InterruptedException e) {
                 WebLog.logError("Error sending message:", e);
             }
         }
@@ -132,19 +136,17 @@ public class ChatUtils {
         chatSession.clearNotificationReceived();
     }
 
-    public static void customerIsTyping(String chatID) {
+    public static void customerIsTyping(String chatID) throws NotConnectedException, InterruptedException {
+      
         ChatSession chatSession = getChatSession(chatID);
         if (chatSession == null) {
             return;
         }
 
-
         final MultiUserChat chat = chatSession.getGroupChat();
-        final Iterator iter = chat.getOccupants();
-        while (iter.hasNext()) {
-            String from = (String)iter.next();
-            String tFrom = StringUtils.parseResource(from);
-            String nickname = chat.getNickname();
+        for( EntityFullJid from : chat.getOccupants() ) {
+            Resourcepart tFrom = from.getResourceOrNull();
+            Resourcepart nickname = chat.getNickname();
             if (tFrom != null && !tFrom.equals(nickname)) {
                 MessageEventManager messageEventManager = chatSession.getMessageEventManager();
                 messageEventManager.sendComposingNotification(from, "l0k1");
@@ -153,7 +155,7 @@ public class ChatUtils {
     }
 
 
-    public static ChatQueue getChatQueue(String chatID) {
+    public static ChatQueue getChatQueue(String chatID) throws NoResponseException, XMPPErrorException, NotConnectedException, InterruptedException {
         ChatSession chatSession = getChatSession(chatID);
         if (chatSession == null) {
             return null;
@@ -210,11 +212,15 @@ public class ChatUtils {
         ChatManager chatManager = ChatManager.getInstance();
         ChatSession chatSession = chatManager.getChatSession(chatID);
         if (chatSession != null) {
-            String lastAgent = chatSession.getLastAgentInRoom();
+            Resourcepart lastAgent = chatSession.getLastAgentInRoom();
             if (lastAgent == null) {
-                lastAgent = "Agent";
+                try {
+                  lastAgent = Resourcepart.from("Agent");
+                } catch (XmppStringprepException e) {
+                  throw new IllegalArgumentException(e.getLocalizedMessage());
+                }
             }
-            return FormText.agentHasEndedConversation(lastAgent, workgroup);
+            return FormText.agentHasEndedConversation(lastAgent.toString(), workgroup);
         }
 
         return "Your chat has ended.";

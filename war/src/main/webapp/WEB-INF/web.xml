@@ -54,12 +54,12 @@
     <servlet>
         <servlet-name>FastpathServlet</servlet-name>
         <servlet-class>org.jivesoftware.webchat.FastpathServlet</servlet-class>
-        <!-- Uncomment to have console debugger enabled
+        <!-- Uncomment to have console debugger enabled -->
         <init-param>
            <param-name>smackDebugger</param-name>
-           <param-value>org.jivesoftware.smackx.debugger.ConsoleDebugger</param-value>
+           <param-value>org.jivesoftware.smack.debugger.ConsoleDebugger</param-value>
         </init-param>
-        -->
+        <!-- -->
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet>
@@ -86,13 +86,13 @@
             <param-name>crossDomainSessionSecurity</param-name>
             <param-value>false</param-value>
         </init-param>
-        <!--
+        
         <init-param>
             <param-name>debug</param-name>
             <param-value>true</param-value>
             <description>Do we startup in debug/test mode?</description>
         </init-param>
-        -->
+        
         <load-on-startup>-1</load-on-startup>
     </servlet>
     <servlet-mapping>

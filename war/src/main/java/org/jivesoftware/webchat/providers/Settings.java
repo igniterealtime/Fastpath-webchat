@@ -12,12 +12,14 @@
 
 package org.jivesoftware.webchat.providers;
 
-import org.jivesoftware.webchat.util.WebLog;
+import java.util.Map;
+
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.PrivateDataManager;
-
-import java.util.Map;
+import org.jivesoftware.smackx.iqprivate.PrivateDataManager;
+import org.jivesoftware.webchat.util.WebLog;
 
 /**
  * Handles all generic metadata settings for a particular workgroup. For example, to retrieve emails settings for
@@ -55,20 +57,20 @@ public class Settings {
      * @return a map of found settings.  If no settings have been found, it will
      * return null.
      */
-    public static Map getSettings(XMPPConnection con, String workgroup, String setting) {
+    public static Map<String , String> getSettings(XMPPConnection con, String workgroup, String setting) {
 
         try {
-            PrivateDataManager personalPDM = new PrivateDataManager(con, workgroup);
+            PrivateDataManager personalPDM = PrivateDataManager.getInstanceFor(con);
 
             String namespace = "workgroup:" + workgroup + ":settings:" + setting;
             String elementName = "workgroup_settings";
 
             PrivateDataManager.addPrivateDataProvider(elementName, namespace, new SettingsDataProvider());
             SettingsPrivateData data = (SettingsPrivateData) personalPDM.getPrivateData(elementName, namespace);
-            Map map = data.getMap();
+            Map<String , String> map = data.getMap();
             return map;
         }
-        catch (XMPPException e) {
+        catch (XMPPException | NoResponseException | NotConnectedException | InterruptedException e) {
             WebLog.logError("Could not load private data:", e);
         }
         return null;

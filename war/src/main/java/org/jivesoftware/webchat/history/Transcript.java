@@ -20,13 +20,13 @@ import java.util.List;
  */
 final public class Transcript {
 
-    private List transcript;
+    private List<Line> transcript;
 
     /**
      * Empty Constructor
      */
     public Transcript() {
-        transcript = new ArrayList();
+        transcript = new ArrayList<>();
     }
 
     /**
@@ -41,7 +41,7 @@ final public class Transcript {
      * Returns the current Chat Transcript.
      * @return the current Chat Transcript.
      */
-    public List getTranscript() {
+    public List<Line> getTranscript() {
         return transcript;
     }
 }

@@ -28,7 +28,7 @@
 %>
     <script type="text/javascript">
 
-         DWREngine.setErrorHandler(handleError);
+        dwr.engine.setErrorHandler(handleError);
 
         function handleError(error){
         // Will ignore due to dwr bug.

@@ -6,7 +6,6 @@
     <groupId>org.igniterealtime.openfire.fastpath</groupId>
     <version>2.6.2</version>
   </parent>
-  <groupId>org.igniterealtime.openfire.fastpath</groupId>
   <artifactId>webchat-war</artifactId>
   <packaging>war</packaging>
   <name>Fastpath Webchat war</name>
@@ -61,19 +60,32 @@
   <dependencies>
     <dependency>
       <groupId>org.igniterealtime.smack</groupId>
-      <artifactId>smack</artifactId>
-      <version>3.2.1</version>
+      <artifactId>smack-debug</artifactId>
+      <version>${smack.version}</version>
     </dependency>
     <dependency>
       <groupId>org.igniterealtime.smack</groupId>
-      <artifactId>smackx</artifactId>
-      <version>3.2.1</version>
+      <artifactId>smack-java7</artifactId>
+      <version>${smack.version}</version>
     </dependency>
     <dependency>
       <groupId>org.igniterealtime.smack</groupId>
-      <artifactId>smackx-debug</artifactId>
-      <version>3.2.1</version>
+      <artifactId>smack-tcp</artifactId>
+      <version>${smack.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.igniterealtime.smack</groupId>
+      <artifactId>smack-extensions</artifactId>
+      <version>${smack.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.igniterealtime.smack</groupId>
+      <artifactId>smack-legacy</artifactId>
+      <version>${smack.version}</version>
+    </dependency>
+    
+    
+    
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>

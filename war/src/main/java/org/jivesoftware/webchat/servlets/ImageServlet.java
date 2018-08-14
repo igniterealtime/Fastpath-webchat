@@ -12,14 +12,17 @@
 
 package org.jivesoftware.webchat.servlets;
 
-import org.jivesoftware.webchat.util.SettingsManager;
+import java.io.IOException;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
+import org.jivesoftware.webchat.util.SettingsManager;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
 
 /**
  * Retrieves the images belonging to particular workgroup. This is used for the look and feel of
@@ -37,10 +40,11 @@ public class ImageServlet extends HttpServlet {
         // Initialize adminManager
         final String imageName = request.getParameter(IMAGE);
         final String workgroupName = request.getParameter(WORKGROUP);
+        Jid workgroupJid = JidCreate.from(workgroupName);
 
         final SettingsManager imageManager = SettingsManager.getInstance();
 
-        byte[] imageBytes = imageManager.getImage(imageName, workgroupName, getServletContext());
+        byte[] imageBytes = imageManager.getImage(imageName, workgroupJid, getServletContext());
         if (imageBytes == null) {
             getServletContext().log(imageName + " for " + workgroupName + " is null.");
             return;

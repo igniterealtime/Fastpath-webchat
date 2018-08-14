@@ -10,11 +10,17 @@
   - agreement with Jive.
 --%>
 
+<%@page import="javax.net.SocketFactory"%>
+<%@page import="org.jivesoftware.smack.ConnectionConfiguration.SecurityMode"%>
+<%@page import="org.jivesoftware.smack.packet.StreamError.Condition"%>
+<%@page import="org.jivesoftware.smack.XMPPException.XMPPErrorException"%>
+<%@page import="org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration"%>
+<%@page import="org.jivesoftware.smack.tcp.XMPPTCPConnection"%>
 <%@ page import="org.jivesoftware.webchat.util.ParamUtils,
                  java.util.Map,
                  java.util.HashMap,
                  java.net.InetAddress,
-                 org.jivesoftware.smack.XMPPConnection"%>
+                 org.jivesoftware.smack.packet.XMPPError"%>
  <%@ page import="java.util.Iterator" %>
  <%@ page import="org.jivesoftware.smack.ConnectionConfiguration" %>
  <%@ page import="org.jivesoftware.smack.XMPPException" %>
@@ -26,7 +32,7 @@
     boolean doSave = request.getParameter("save") != null;
 
     // handle a continue request:
-    Map errors = new HashMap();
+    Map<String, String> errors = new HashMap<>();
     if (doSave) {
         // Validate parameters
         if (domain == null) {
@@ -37,14 +43,20 @@
         }
 
         try {
-            ConnectionConfiguration xmppConfig = new ConnectionConfiguration(domain, port);
-            XMPPConnection con = new XMPPConnection(xmppConfig);
+            XMPPTCPConnectionConfiguration.Builder xmppConfig =  XMPPTCPConnectionConfiguration.builder()
+               .setSecurityMode(XMPPTCPConnectionConfiguration.SecurityMode.disabled)
+               .setCompressionEnabled(true)
+               .setXmppDomain(domain)
+               .setHost(domain)
+               .setPort(port);
+            xmppConfig.performSaslAnonymousAuthentication();
+            XMPPTCPConnection con = new XMPPTCPConnection(xmppConfig.build());
             con.connect();
-            con.loginAnonymously();
+            con.login();
         }
-        catch (XMPPException xe) {
+        catch (XMPPErrorException xe) {
             // If anonymous login disabled.
-            if (xe.getXMPPError().getCode() == 403) {
+            if (xe.getXMPPError().getCondition() == XMPPError.Condition.forbidden) {
                 errors.put("connect", "Anonymous login test failed. Ensure that anonymous logins are enabled on the server.");
             }
             else {
@@ -57,7 +69,7 @@
 
         // Continue if there were no errors
         if (errors.size() == 0) {
-            Map xmppSettings = new HashMap();
+            Map<String,String> xmppSettings = new HashMap<>();
 
             xmppSettings.put("xmpp.domain",domain);
             xmppSettings.put("xmpp.socket.plain.port",Integer.toString(port));

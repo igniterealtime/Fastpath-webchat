@@ -14,7 +14,8 @@
                  org.jivesoftware.webchat.actions.WorkgroupStatus,
                  org.jivesoftware.webchat.util.ModelUtil,
                  org.jivesoftware.webchat.util.ParamUtils" %>
-<%@ page import="org.jivesoftware.webchat.ChatSession"%><%@ page import="org.jivesoftware.webchat.ChatManager"%>
+<%@ page import="org.jivesoftware.webchat.ChatSession"%>
+<%@ page import="org.jivesoftware.webchat.ChatManager"%>
 <%@ page errorPage="fatal.jsp" %>
 
 <%

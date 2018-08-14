@@ -11,10 +11,13 @@
 
 package org.jivesoftware.webchat.util;
 
-import org.jivesoftware.smackx.workgroup.settings.ChatSetting;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.jivesoftware.smackx.workgroup.settings.ChatSetting;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.stringprep.XmppStringprepException;
 
 public class FormText {
 
@@ -125,19 +128,30 @@ public class FormText {
 
     public static String getTextSetting(String key, String workgroup) {
         SettingsManager settingsManager = SettingsManager.getInstance();
-        ChatSetting chatSettings = settingsManager.getChatSetting(key, workgroup);
+        
+        try {
+          Jid workgroupJid = JidCreate.from(workgroup);
+          
+          ChatSetting chatSettings = settingsManager.getChatSetting(key, workgroupJid);
 
-        Date now = new Date();
-        String date = DATE_FORMATTER.format(now);
-        String time = TIME_FORMATTER.format(now);
+          Date now = new Date();
+          String date = DATE_FORMATTER.format(now);
+          String time = TIME_FORMATTER.format(now);
 
-        if (chatSettings == null) {
-            return "";
+          if (chatSettings == null) {
+              return "";
+          }
+
+          String value = chatSettings.getValue();
+          value = WebUtils.replace(value, "${time}", time);
+          value = WebUtils.replace(value, "${date}", date);
+          return value;
+
+        } catch (XmppStringprepException e) {
+          
+          WebLog.logError("getTextSetting : " + e.getLocalizedMessage());
+          return "";
+          
         }
-
-        String value = chatSettings.getValue();
-        value = WebUtils.replace(value, "${time}", time);
-        value = WebUtils.replace(value, "${date}", date);
-        return value;
     }
 }

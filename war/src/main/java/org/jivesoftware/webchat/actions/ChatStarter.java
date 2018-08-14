@@ -12,18 +12,6 @@
 
 package org.jivesoftware.webchat.actions;
 
-import org.jivesoftware.smackx.workgroup.settings.WorkgroupProperties;
-import org.jivesoftware.smackx.workgroup.user.Workgroup;
-import org.jivesoftware.webchat.ChatManager;
-import org.jivesoftware.webchat.ChatSession;
-import org.jivesoftware.webchat.providers.MetaDataProvider;
-import org.jivesoftware.webchat.settings.ChatSettingsManager;
-import org.jivesoftware.webchat.settings.ConnectionSettings;
-import org.jivesoftware.webchat.util.ModelUtil;
-import org.jivesoftware.webchat.util.StringUtils;
-import org.jivesoftware.webchat.util.WebLog;
-import org.jivesoftware.smack.XMPPException;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -35,6 +23,23 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.workgroup.settings.WorkgroupProperties;
+import org.jivesoftware.smackx.workgroup.user.Workgroup;
+import org.jivesoftware.webchat.ChatManager;
+import org.jivesoftware.webchat.ChatSession;
+import org.jivesoftware.webchat.providers.MetaDataProvider;
+import org.jivesoftware.webchat.settings.ChatSettingsManager;
+import org.jivesoftware.webchat.settings.ConnectionSettings;
+import org.jivesoftware.webchat.util.ModelUtil;
+import org.jivesoftware.webchat.util.StringUtils;
+import org.jivesoftware.webchat.util.WebLog;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.jid.parts.Resourcepart;
+import org.jxmpp.stringprep.XmppStringprepException;
 
 /**
  * Puts users into the ChatQueue to await assistance. The ChatStarter is used
@@ -51,8 +56,13 @@ public class ChatStarter extends WebBean {
 
     /**
      * Joins a queue with associated metadata.
+     * @param workgroup 
+     * @param chatID 
      */
     public void startSession(String workgroup, String chatID) {
+      
+      WebLog.log("startSession: " + chatID);
+      
         ChatSession chatSession = chatManager.getChatSession(chatID);
 
         // If the user already has a session, close it down.
@@ -61,7 +71,7 @@ public class ChatStarter extends WebBean {
         }
 
         try {
-            final List searchedList = new ArrayList();
+            final List<String> searchedList = new ArrayList<>();
 
             // Create a new session.
             ChatSettingsManager settingsManager = chatManager.getChatSettingsManager();
@@ -75,15 +85,15 @@ public class ChatStarter extends WebBean {
             }
 
             // Gather all meta-data.
-            final Map metadata = new HashMap();
+            final Map<String, String> metadata = new HashMap<>();
 
             // Add standard Request Properties
             //addRequestProperties(metadata);
 
             // Look for cookies to set
-            Enumeration setCookieEnum = request.getParameterNames();
+            Enumeration<String> setCookieEnum = request.getParameterNames();
             while (setCookieEnum.hasMoreElements()) {
-                String name = (String)setCookieEnum.nextElement();
+                String name = setCookieEnum.nextElement();
                 if (name.startsWith("setCookie_")) {
                     String variableToSet = name.substring(10);
                     String parameter = request.getParameter(variableToSet);
@@ -106,9 +116,9 @@ public class ChatStarter extends WebBean {
 
             // Add all Parameters to Metadata.
             final String[] exclusionList = {"submit", "refresh", "location", "noUI"};
-            final Enumeration nameEnum = request.getParameterNames();
+            final Enumeration<String> nameEnum = request.getParameterNames();
             while (nameEnum.hasMoreElements()) {
-                String key = (String)nameEnum.nextElement();
+                String key = nameEnum.nextElement();
                 String value = request.getParameter(key);
                 if (!metadata.containsKey(key) && !searchedList.contains(key)) {
                     boolean excludeIt = false;
@@ -182,11 +192,15 @@ public class ChatStarter extends WebBean {
                 metadata.put("Location", request.getParameter("location"));
             }
 
+            Jid uniqueIDJid = JidCreate.from(uniqueID);
+            Resourcepart nicknameResource = Resourcepart.from(nickname);
+            
+            chatSession = new ChatSession(host, port, sslEnabled, uniqueIDJid, nicknameResource, email, chatID);
 
-            chatSession = new ChatSession(host, port, sslEnabled, uniqueID, nickname, email, chatID);
-
+            Jid workgroupJid = JidCreate.from(workgroup);
+            
             // load workgroup properties and check of authentication is required for this workgroup
-            Workgroup wGroup = new Workgroup(workgroup, chatManager.getGlobalConnection());
+            Workgroup wGroup = new Workgroup(workgroupJid, chatManager.getGlobalConnection());
             WorkgroupProperties properties = null;
             try {
                 properties = wGroup.getWorkgroupProperties();
@@ -251,7 +265,7 @@ public class ChatStarter extends WebBean {
             }
 
             // Filter metadata
-            Map filteredData = filterMetadata(metadata);
+            Map<String, Object> filteredData = filterMetadata(metadata);
 
             // Join the Workgroup Queue
             filteredData.remove("chatID");
@@ -263,7 +277,7 @@ public class ChatStarter extends WebBean {
             }
 
             chatManager.addChatSession(chatID, chatSession);
-            chatSession.joinQueue(workgroup, filteredData);
+            chatSession.joinQueue(workgroupJid, filteredData);
 
             try {
                 request.getRequestDispatcher("/view-queue.jsp").forward(request, response);
@@ -272,7 +286,7 @@ public class ChatStarter extends WebBean {
                 ex.printStackTrace();
             }
         }
-        catch (XMPPException e) {
+        catch (XMPPException | XmppStringprepException | SmackException | InterruptedException e) {
             try {
                 WebLog.logError("Could not join queue - ", e);
                 response.sendRedirect("email/leave-a-message.jsp?workgroup=" + workgroup);
@@ -283,7 +297,7 @@ public class ChatStarter extends WebBean {
         }
     }
 
-    private void addRequestProperties(Map metadata) {
+    private void addRequestProperties(Map<String, String> metadata) {
         // Retrieve the users IP Address
         String ipAddress = request.getRemoteAddr();
         if (ipAddress != null) {
@@ -306,11 +320,11 @@ public class ChatStarter extends WebBean {
         }
     }
 
-    private Map filterMetadata(Map map) {
-        Map newMap = new HashMap(map);
-        final Iterator iter = map.keySet().iterator();
+    private Map<String, Object> filterMetadata(Map<String, String> map) {
+        Map<String, Object> newMap = new HashMap<>(map.size());
+        final Iterator<String> iter = map.keySet().iterator();
         while (iter.hasNext()) {
-            String key = (String)iter.next();
+            String key = iter.next();
             int indexOf = key.indexOf("0");
             if (key.endsWith("0")) {
                 key = key.substring(0, indexOf);
@@ -325,11 +339,11 @@ public class ChatStarter extends WebBean {
         return newMap;
     }
 
-    private void consolidateMetadata(String key, Map map, Map newMap) {
-        List values = new ArrayList();
-        final Iterator iter = map.keySet().iterator();
+    private void consolidateMetadata(String key, Map<String, String> map, Map<String, Object> newMap) {
+        List<String> values = new ArrayList<>();
+        final Iterator<String> iter = map.keySet().iterator();
         while (iter.hasNext()) {
-            String k = (String)iter.next();
+            String k = iter.next();
             if (k.startsWith(key)) {
                 String value = (String)map.get(k);
                 values.add(value);

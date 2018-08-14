@@ -12,8 +12,10 @@
 
 <%@ page  import = "org.jivesoftware.webchat.ChatManager,
                     org.jivesoftware.smackx.workgroup.user.Workgroup,
-                    org.jivesoftware.smackx.Form,
-                    org.jivesoftware.smackx.FormField"
+                    org.jivesoftware.smackx.xdata.Form,
+                    org.jivesoftware.smackx.xdata.FormField,
+                    org.jxmpp.jid.Jid,
+                    org.jxmpp.jid.impl.JidCreate"
                     errorPage="fatal.jsp"%>
 <%@ page import="java.util.*"%>
 <%@ page import="org.jivesoftware.webchat.actions.WorkgroupStatus" %>
@@ -35,19 +37,21 @@
         chatID = StringUtils.randomString(10);
     }
 
-    Workgroup chatWorkgroup = WorkgroupStatus.getWorkgroup(workgroup);
+    Jid workgroupJid = JidCreate.from(workgroup);
+    
+    Workgroup chatWorkgroup = WorkgroupStatus.getWorkgroup(workgroupJid);
     if (!chatWorkgroup.isAvailable()) {
         response.sendRedirect("email/leave-a-message.jsp?workgroup=" + StringUtils.URLEncode(workgroup, "utf-8"));
         return;
     }
 
-    Form workgroupForm = WorkgroupStatus.getWorkgroupForm(workgroup);
+    Form workgroupForm = WorkgroupStatus.getWorkgroupForm(workgroupJid);
     String welcomeText = FormText.getWelcomeText(workgroup);
     String startButton = FormText.getStartButton(workgroup);
 
     // Add query string to session
     Enumeration params = request.getParameterNames();
-    Map paramMap = new HashMap();
+    Map<String,String> paramMap = new HashMap<>();
     while (params.hasMoreElements()) {
         String paramName = (String)params.nextElement();
         String paramValue = (String)request.getParameter(paramName);
@@ -107,9 +111,8 @@
     <script>
         function ValidateForm() {
         <%
-               Iterator iter = workgroupForm.getFields();
-               while(iter.hasNext()){
-                   FormField field = (FormField)iter.next();
+             List<FormField> formFields = workgroupForm.getFields();
+             for (FormField field : formFields){
                    boolean required = field.isRequired();
                    String variable = field.getVariable();
                    if(required && !"email".equals(variable)){
@@ -270,14 +273,13 @@
             <% } %>
 
             <%
-                       Iterator fields = workgroupForm.getFields();
-                       while(fields.hasNext()){
+                   List<FormField> fields = workgroupForm.getFields();
+                   for (FormField field : formFields) {
                            hasElements = true;
-                           FormField field = (FormField)fields.next();
                            String label = field.getLabel();
                            boolean required = field.isRequired();
                            String requiredStr = required ? "&nbsp;<span class=\"error\">*</span>" : "";
-                           if(!field.getType().equals(FormField.TYPE_HIDDEN)){
+                           if(!field.getType().equals(FormField.Type.hidden)){
                    %>
                    <tr valign="top">
                      <td class="formtext" height="1%" width="1%" nowrap><%= label%><%= requiredStr%></td><td><%= FormUtils.createAnswers(field, request)%></td>
@@ -289,9 +291,8 @@
               <!-- All workgroup defined variables -->
                 <%
                        fields = workgroupForm.getFields();
-                       while(fields.hasNext()){
-                           FormField field = (FormField)fields.next();
-                           if(field.getType().equals(FormField.TYPE_HIDDEN)){
+                       for (FormField field : formFields){
+                           if(field.getType().equals(FormField.Type.hidden)){
                  %>
                  <%= FormUtils.createDynamicField(field, request)%>
                  <% }} %>

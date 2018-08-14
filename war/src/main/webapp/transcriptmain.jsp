@@ -13,18 +13,21 @@
 <%@ page import="org.jivesoftware.webchat.util.ModelUtil,
                  org.jivesoftware.webchat.ChatManager,
                  org.jivesoftware.webchat.ChatSession,
-                 org.jivesoftware.smack.XMPPConnection,
+                 org.jivesoftware.smack.tcp.XMPPTCPConnection,
                  java.util.Map,
                  org.jivesoftware.webchat.providers.Settings,
                  org.jivesoftware.smackx.workgroup.user.WorkgroupExt,
                  org.jivesoftware.webchat.util.FormText,
-                 org.jivesoftware.webchat.util.ParamUtils,
-                 org.jivesoftware.smack.util.StringUtils" errorPage="fatal.jsp" %>
+                  org.jivesoftware.webchat.util.ParamUtils,
+                  org.jxmpp.jid.Jid,
+                  org.jxmpp.jid.impl.JidCreate" errorPage="fatal.jsp" %>
 
 <%
     String workgroup = request.getParameter("workgroup");
     String chatID = request.getParameter("chatID");
 
+    Jid workgroupJid = JidCreate.from(workgroup);
+    
     ChatManager chatManager = ChatManager.getInstance();
     ChatSession chatSession = chatManager.getChatSession(chatID);
     if (!ModelUtil.hasLength(workgroup) || chatSession == null) {
@@ -35,13 +38,13 @@
     // Close Chat Session
     chatSession.close();
 
-    XMPPConnection con = chatManager.getGlobalConnection();
+    XMPPTCPConnection con = chatManager.getGlobalConnection();
     if(!con.isConnected()){
         response.sendRedirect("chat-ended.jsp");
         return;
     }
 
-    WorkgroupExt wgroup = new WorkgroupExt(workgroup, con);
+    WorkgroupExt wgroup = new WorkgroupExt(workgroupJid, con);
     boolean isEmailConfigured = wgroup.isEmailAvailable();
 
     if(!isEmailConfigured){
@@ -50,7 +53,7 @@
     }
 
     String to = ParamUtils.getParameter(request, "to");
-    String sessionID = StringUtils.parseName(chatSession.getRoomName());
+    String sessionID = chatSession.getRoomName().getLocalpartOrThrow().toString();
 
     boolean transcriptSent = false;
     if(ModelUtil.hasLength(to)){

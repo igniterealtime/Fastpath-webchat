@@ -10,16 +10,14 @@
 
 package org.jivesoftware.webchat;
 
-import org.jivesoftware.webchat.actions.WorkgroupStatus;
-import org.jivesoftware.webchat.settings.ChatSettingsManager;
-import org.jivesoftware.webchat.util.ModelUtil;
-import org.jivesoftware.webchat.util.SettingsManager;
-import org.jivesoftware.webchat.util.URLFileSystem;
-import org.jivesoftware.webchat.util.WebLog;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.packet.Presence;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -29,14 +27,22 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.Timer;
-import java.util.TimerTask;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.SmackException.NotLoggedInException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.roster.Roster;
+import org.jivesoftware.webchat.actions.WorkgroupStatus;
+import org.jivesoftware.webchat.settings.ChatSettingsManager;
+import org.jivesoftware.webchat.util.ModelUtil;
+import org.jivesoftware.webchat.util.SettingsManager;
+import org.jivesoftware.webchat.util.URLFileSystem;
+import org.jivesoftware.webchat.util.WebLog;
+import org.jxmpp.jid.BareJid;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
 
 /**
  * Live Assistant servlet.
@@ -159,6 +165,8 @@ public class FastpathServlet extends HttpServlet {
             String offline = request.getParameter("offline");
             String online = request.getParameter("online");
 
+            Jid workgroupJid = JidCreate.from(workgroup);
+            
             boolean isOnline = WorkgroupStatus.isOnline(workgroup);
             if (ModelUtil.hasLength(offline) && ModelUtil.hasLength(online)) {
                 response.sendRedirect(isOnline ? online : offline);
@@ -168,10 +176,10 @@ public class FastpathServlet extends HttpServlet {
 
             byte[] imageBytes = null;
             if (isOnline) {
-                imageBytes = imageManager.getImage("online", workgroup, getServletContext());
+                imageBytes = imageManager.getImage("online", workgroupJid, getServletContext());
             }
             else {
-                imageBytes = imageManager.getImage("offline", workgroup, getServletContext());
+                imageBytes = imageManager.getImage("offline", workgroupJid, getServletContext());
             }
 
             imageManager.writeBytesToStream(imageBytes, response);
@@ -181,11 +189,13 @@ public class FastpathServlet extends HttpServlet {
         if (action.equals("agentAvailable")) {
             String requestAgent = request.getParameter("requestAgent");
             String workgroup = request.getParameter("workgroup");
+            Jid workgroupJid = JidCreate.from(workgroup);
+            BareJid requestAgentJid = JidCreate.bareFrom(requestAgent);
+            
             boolean isOnline = WorkgroupStatus.isOnline(workgroup);
 
-
-            final Roster roster = chatManager.getGlobalConnection().getRoster();
-            final Presence presence = roster.getPresence(requestAgent);
+            final Roster roster =  Roster.getInstanceFor( chatManager.getGlobalConnection());
+            final Presence presence = roster.getPresence(requestAgentJid);
 
             if (isOnline && presence != null && presence.getType() == Presence.Type.available) {
                 isOnline = true;
@@ -196,10 +206,10 @@ public class FastpathServlet extends HttpServlet {
 
             byte[] image = null;
             if (isOnline) {
-                image = imageManager.getImage("online", workgroup, getServletContext());
+                image = imageManager.getImage("online", workgroupJid, getServletContext());
             }
             else {
-                image = imageManager.getImage("offline", workgroup, getServletContext());
+                image = imageManager.getImage("offline", workgroupJid, getServletContext());
             }
 
             imageManager.writeBytesToStream(image, response);
@@ -209,10 +219,13 @@ public class FastpathServlet extends HttpServlet {
         if (action.equals("agentCard")) {
             String requestAgent = request.getParameter("requestAgent");
             String workgroup = request.getParameter("workgroup");
+            Jid workgroupJid = JidCreate.from(workgroup);
+            BareJid requestAgentJid = JidCreate.bareFrom(requestAgent);
+            
             boolean isOnline = WorkgroupStatus.isOnline(workgroup);
 
-            final Roster roster = chatManager.getGlobalConnection().getRoster();
-            final Presence presence = roster.getPresence(requestAgent);
+            final Roster roster =  Roster.getInstanceFor( chatManager.getGlobalConnection());
+            final Presence presence = roster.getPresence(requestAgentJid);
 
             if (isOnline && presence != null && presence.getType() == Presence.Type.available) {
                 isOnline = true;
@@ -222,12 +235,12 @@ public class FastpathServlet extends HttpServlet {
             }
 
             if (!isOnline) {
-                Object o = roster.getEntry(requestAgent);
+                Object o = roster.getEntry(requestAgentJid);
                 if (o == null) {
                     try {
-                        roster.createEntry(requestAgent, requestAgent, null);
+                        roster.createEntry(requestAgentJid, requestAgent, null);
                     }
-                    catch (XMPPException e) {
+                    catch (XMPPException | NotLoggedInException | NoResponseException | NotConnectedException | InterruptedException e) {
                         WebLog.logError("Error checking roster", e);
                     }
                 }
@@ -235,10 +248,10 @@ public class FastpathServlet extends HttpServlet {
 
             byte[] image = null;
             if (isOnline) {
-                image = imageManager.getImage("personalonline", workgroup, getServletContext());
+                image = imageManager.getImage("personalonline", workgroupJid, getServletContext());
             }
             else {
-                image = imageManager.getImage("personaloffline", workgroup, getServletContext());
+                image = imageManager.getImage("personaloffline", workgroupJid, getServletContext());
             }
 
             imageManager.writeBytesToStream(image, response);
@@ -276,11 +289,11 @@ public class FastpathServlet extends HttpServlet {
             msg.append(request.getCharacterEncoding()).append("<p>");
 
             // Write out params
-            Enumeration paramEnums = request.getParameterNames();
+            Enumeration<String> paramEnums = request.getParameterNames();
             msg.append("<b>Parameters:</b><ul>");
             if (paramEnums.hasMoreElements()) {
                 while (paramEnums.hasMoreElements()) {
-                    String name = (String)paramEnums.nextElement();
+                    String name = paramEnums.nextElement();
                     String value = request.getParameter(name);
                     msg.append("<li>").append(name).append("=").append(value);
                 }
@@ -293,12 +306,14 @@ public class FastpathServlet extends HttpServlet {
 
     /**
      * convenience method, used ultimately in constructing packet filters.
+     * @param p 
+     * @return 
      */
-    protected String getPacketIDRoot(Packet p) {
+    protected String getPacketIDRoot(Stanza p) {
         if (p == null) {
             return null;
         }
-        return p.getPacketID().substring(0, 5);
+        return p.getStanzaId().substring(0, 5);
     }
 
     // Utility methods //

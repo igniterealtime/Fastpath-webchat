@@ -59,12 +59,12 @@ errorPage="fatal.jsp"%>
                         }
 
 
-                        List transcriptLines = transcript.getTranscript();
+                        List<Line> transcriptLines = transcript.getTranscript();
 
                         for (int i = 0; i < transcriptLines.size(); i++) {
-                            Line line = (Line) transcriptLines.get(i);
+                            Line line = transcriptLines.get(i);
 
-                            String from = line.getFrom();
+                            String from = line.getFrom().toString();
                             String text = line.getText();
                             String cp = request.getContextPath();
                             String full = request.getRequestURL().toString();

@@ -11,15 +11,16 @@
  */
 package org.jivesoftware.webchat.util;
 
-import org.jivesoftware.smackx.FormField;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import org.jivesoftware.smackx.xdata.FormField;
+import org.jivesoftware.smackx.xdata.FormField.Option;
 
 public class FormUtils {
 
@@ -28,7 +29,7 @@ public class FormUtils {
 
     public static String createAnswers(FormField formField, HttpServletRequest request) {
         final StringBuffer builder = new StringBuffer();
-        if (formField.getType().equals(FormField.TYPE_TEXT_SINGLE)) {
+        if (formField.getType().equals(FormField.Type.text_single)) {
             String cookieValue = getCookieValueForField(formField.getVariable(), request);
             String insertValue = "";
             if(ModelUtil.hasLength(cookieValue)){
@@ -36,26 +37,24 @@ public class FormUtils {
             }
             builder.append("<input type=\"text\" name=\"" + formField.getVariable() + "\" "+insertValue+" style=\"width:75%\">");
         }
-        else if (formField.getType().equals(FormField.TYPE_TEXT_MULTI)) {
+        else if (formField.getType().equals(FormField.Type.text_multi)) {
             builder.append("<textarea name=\"" + formField.getVariable() + "\" cols=\"30\" rows=\"3\">");
             builder.append("</textarea>");
         }
-        else if (formField.getType().equals(FormField.TYPE_LIST_SINGLE)) {
+        else if (formField.getType().equals(FormField.Type.list_single)) {
             builder.append("<select name=\"" + formField.getVariable() + "\" >");
-            Iterator iter = formField.getOptions();
+            List<Option> options = formField.getOptions();
             String cookieValue = ModelUtil.emptyStringIfNull(getCookieValueForField(formField.getVariable(), request));
-            while (iter.hasNext()) {
-                FormField.Option option = (FormField.Option)iter.next();
+            for (Option option : options){
                 String selected = option.getValue().equals(cookieValue) ? "selected" : "";
                 builder.append("<option value=\"" + StringUtils.escapeHTMLTags(option.getValue()) + "\" "+selected+">" + option.getLabel() + "</option>");
             }
             builder.append("</select>");
         }
-        else if (formField.getType().equals(FormField.TYPE_BOOLEAN)) {
-            Iterator iter = formField.getOptions();
+        else if (formField.getType().equals(FormField.Type.bool)) {
+          List<Option> options = formField.getOptions();
             int counter = 0;
-            while (iter.hasNext()) {
-                FormField.Option option = (FormField.Option)iter.next();
+            for (Option option : options){
                 String value = option.getLabel();
                 builder.append("<input type=\"checkbox\" value=\"" + value + "\" name=\"" + formField.getVariable() + counter + "\">");
                 builder.append("&nbsp;");
@@ -64,10 +63,9 @@ public class FormUtils {
                 counter++;
             }
         }
-        else if (formField.getType().equals(FormField.TYPE_LIST_MULTI)) {
-            Iterator iter = formField.getOptions();
-            while (iter.hasNext()) {
-                FormField.Option option = (FormField.Option)iter.next();
+        else if (formField.getType().equals(FormField.Type.list_multi)) {
+          List<Option> options = formField.getOptions();
+          for (Option option : options){
                 String value = option.getLabel();
                 builder.append("<input type=\"radio\" value=\"" + value + "\" name=\"" + formField.getVariable() + "\">");
                 builder.append("&nbsp;");
@@ -75,16 +73,16 @@ public class FormUtils {
                 builder.append("<br/>");
             }
         }
-        else if (formField.getType().equals(FormField.TYPE_HIDDEN)) {
+        else if (formField.getType().equals(FormField.Type.hidden)) {
             String name = formField.getVariable();
-            Iterator values = formField.getValues();
+            List<String> values = formField.getValues();
             String value = "";
-            while (values.hasNext()) {
-                value = " value=\"" + StringUtils.escapeHTMLTags((String)values.next()) + "\"";
+            for (String item : values) {
+                value = " value=\"" + StringUtils.escapeHTMLTags(item) + "\"";
             }
             builder.append("<input type=\"hidden\" name=\"" + name + "\" " + value + " />");
         }
-        else if (formField.getType().equals(FormField.TYPE_TEXT_PRIVATE)) {
+        else if (formField.getType().equals(FormField.Type.text_private)) {
             String cookieValue = getCookieValueForField(formField.getVariable(), request);
             String insertValue = "";
             if(ModelUtil.hasLength(cookieValue)){
@@ -105,12 +103,12 @@ public class FormUtils {
      * @return the built string, if form field is hidden, else returns an empty string.
      */
     public static String createDynamicField(FormField formField, HttpServletRequest request) {
-        if (formField.getType().equals(FormField.TYPE_HIDDEN)) {
+        if (formField.getType().equals(FormField.Type.hidden)) {
             String name = formField.getVariable();
-            Iterator values = formField.getValues();
+            List<String> values = formField.getValues();
             String value = "";
-            while (values.hasNext()) {
-                value = (String)values.next();
+            for (String item : values){
+                value = item;
             }
             if (value.startsWith("getRequest_")) {
                 String variableToGet = value.substring(11);

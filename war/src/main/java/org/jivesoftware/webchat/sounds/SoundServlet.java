@@ -1,18 +1,22 @@
 package org.jivesoftware.webchat.sounds;
 
-import org.jivesoftware.smackx.workgroup.user.Workgroup;
-import org.jivesoftware.smackx.workgroup.settings.SoundSettings;
-import org.jivesoftware.webchat.ChatManager;
-import org.jivesoftware.webchat.util.WebLog;
+import java.io.IOException;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import java.io.IOException;
 
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.workgroup.settings.SoundSettings;
+import org.jivesoftware.smackx.workgroup.user.Workgroup;
+import org.jivesoftware.webchat.ChatManager;
+import org.jivesoftware.webchat.util.WebLog;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
 
 public class SoundServlet extends HttpServlet {
 
@@ -27,7 +31,9 @@ public class SoundServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String workgroupName = request.getParameter("workgroup");
         String action = request.getParameter("action");
-        Workgroup workgroup = new Workgroup(workgroupName, ChatManager.getInstance().getGlobalConnection());
+        Jid workgroupJid = JidCreate.from(workgroupName);
+
+        Workgroup workgroup = new Workgroup(workgroupJid, ChatManager.getInstance().getGlobalConnection());
         try {
             SoundSettings soundSettings = workgroup.getSoundSettings();
             response.setContentType("audio/wav");
@@ -38,7 +44,7 @@ public class SoundServlet extends HttpServlet {
                     response.getOutputStream().write(soundSettings.getOutgoingSoundBytes());
                 }
             }
-        } catch (XMPPException e) {
+        } catch (XMPPException | NoResponseException | NotConnectedException | InterruptedException e) {
             WebLog.log("Could not load sound settings for workgroup " + workgroupName);
         }
     }
