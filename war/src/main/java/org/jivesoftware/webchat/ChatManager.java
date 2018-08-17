@@ -88,7 +88,7 @@ public final class ChatManager {
     private ChatManager() {
       
       new WorkgroupInitializer().initialize();
-
+      
         sessions = Collections.synchronizedMap(new HashMap<>());
 
         // Setup timer to check for lingering sessions.

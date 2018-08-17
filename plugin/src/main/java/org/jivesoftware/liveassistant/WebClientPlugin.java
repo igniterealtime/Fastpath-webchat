@@ -129,6 +129,7 @@ public class WebClientPlugin implements Plugin {
         ((AdminConsolePlugin) pluginManager.getPlugin("admin")
                 ).getContexts().removeHandler(context);
         try {
+          if (context != null) 
             context.stop();
         }
         catch (Exception e) {

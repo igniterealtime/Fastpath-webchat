@@ -38,6 +38,7 @@
               <webXml>${project.build.sourceDirectory}/../webapp/WEB-INF/web.xml</webXml>
               <sourceVersion>1.8</sourceVersion>
               <targetVersion>1.8</targetVersion>
+              <keepSources>true</keepSources>
             </configuration>
           </execution>
         </executions>
@@ -95,7 +96,6 @@
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>apache-jsp</artifactId>
       <version>${jetty.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>javax.mail</groupId>
@@ -112,22 +112,22 @@
       <artifactId>commons-el</artifactId>
       <version>1.0</version>
     </dependency>
+    <!-- The default Openfire version 3.0.2-RELEASE used by the admin plugin has an bug when started multiple times -->
     <dependency>
       <groupId>org.directwebremoting</groupId>
       <artifactId>dwr</artifactId>
+      <version>2.0.10</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>jstl</artifactId>
       <version>1.2</version>
     </dependency>
-
     <dependency>
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>apache-jsp</artifactId>
       <version>8.5.23</version>
     </dependency>
-
   </dependencies>
 
 </project>
