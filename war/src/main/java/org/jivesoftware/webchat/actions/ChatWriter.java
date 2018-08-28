@@ -19,6 +19,7 @@ import org.jivesoftware.smackx.xevent.MessageEventManager;
 import org.jivesoftware.webchat.ChatSession;
 import org.jivesoftware.webchat.util.WebLog;
 import org.jivesoftware.webchat.util.WebUtils;
+
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.EntityFullJid;
 import org.jxmpp.jid.parts.Resourcepart;

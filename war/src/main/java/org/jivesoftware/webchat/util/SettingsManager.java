@@ -12,6 +12,19 @@
 
 package org.jivesoftware.webchat.util;
 
+import org.jivesoftware.webchat.ChatManager;
+import org.jivesoftware.webchat.actions.WorkgroupChangeListener;
+import org.jivesoftware.webchat.actions.WorkgroupStatus;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.provider.ProviderManager;
+import org.jivesoftware.smackx.workgroup.settings.ChatSetting;
+import org.jivesoftware.smackx.workgroup.settings.ChatSettings;
+import org.jivesoftware.smackx.workgroup.user.Workgroup;
+import org.jxmpp.jid.Jid;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
@@ -21,18 +34,6 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.provider.ProviderManager;
-import org.jivesoftware.smackx.workgroup.settings.ChatSetting;
-import org.jivesoftware.smackx.workgroup.settings.ChatSettings;
-import org.jivesoftware.smackx.workgroup.user.Workgroup;
-import org.jivesoftware.webchat.ChatManager;
-import org.jivesoftware.webchat.actions.WorkgroupChangeListener;
-import org.jivesoftware.webchat.actions.WorkgroupStatus;
-import org.jxmpp.jid.Jid;
 
 /**
  * Responsible for retrieving and writing out images belong to a workgroup.

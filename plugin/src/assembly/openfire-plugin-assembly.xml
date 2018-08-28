@@ -66,7 +66,7 @@
             <outputDirectory>lib</outputDirectory>
             <useProjectArtifact>true</useProjectArtifact>
             <excludes>
-              <exclude>*:*:war:*</exclude>
+                <exclude>*:*:war:*</exclude>
             </excludes>
         </dependencySet>
         
@@ -75,7 +75,7 @@
             <useProjectArtifact>false</useProjectArtifact>
             <unpack>true</unpack>
             <includes>
-              <include>*:*:war:*</include>
+                <include>*:*:war:*</include>
             </includes>
         </dependencySet>
         

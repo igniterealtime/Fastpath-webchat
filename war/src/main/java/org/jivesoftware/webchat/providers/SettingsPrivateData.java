@@ -12,10 +12,9 @@
 
 package org.jivesoftware.webchat.providers;
 
+import org.jivesoftware.smackx.iqprivate.packet.PrivateData;
 
 import java.util.Map;
-
-import org.jivesoftware.smackx.iqprivate.packet.PrivateData;
 
 /**
  * Represents the private data for the Workgroup Settings.

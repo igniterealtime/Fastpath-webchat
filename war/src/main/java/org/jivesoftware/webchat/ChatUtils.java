@@ -11,7 +11,11 @@
  */
 package org.jivesoftware.webchat;
 
-import java.util.List;
+import org.jivesoftware.webchat.actions.ChatQueue;
+import org.jivesoftware.webchat.personal.ChatMessage;
+import org.jivesoftware.webchat.util.FormText;
+import org.jivesoftware.webchat.util.WebLog;
+import org.jivesoftware.webchat.util.WebUtils;
 
 import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
@@ -20,15 +24,12 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.workgroup.user.Workgroup;
 import org.jivesoftware.smackx.xevent.MessageEventManager;
-import org.jivesoftware.webchat.actions.ChatQueue;
-import org.jivesoftware.webchat.personal.ChatMessage;
-import org.jivesoftware.webchat.util.FormText;
-import org.jivesoftware.webchat.util.WebLog;
-import org.jivesoftware.webchat.util.WebUtils;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.EntityFullJid;
 import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.stringprep.XmppStringprepException;
+
+import java.util.List;
 
 /**
  * ChatUtils handles basic messaging functionallity, including
@@ -215,9 +216,9 @@ public class ChatUtils {
             Resourcepart lastAgent = chatSession.getLastAgentInRoom();
             if (lastAgent == null) {
                 try {
-                  lastAgent = Resourcepart.from("Agent");
+                    lastAgent = Resourcepart.from("Agent");
                 } catch (XmppStringprepException e) {
-                  throw new IllegalArgumentException(e.getLocalizedMessage());
+                    throw new IllegalArgumentException(e.getLocalizedMessage());
                 }
             }
             return FormText.agentHasEndedConversation(lastAgent.toString(), workgroup);

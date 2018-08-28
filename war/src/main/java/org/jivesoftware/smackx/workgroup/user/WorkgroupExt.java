@@ -33,14 +33,6 @@ public class WorkgroupExt extends Workgroup {
         
         this.connection.createStanzaCollectorAndSend(localEmailIQ);
         
-//        StanzaCollector localStanzaCollector = connection.createStanzaCollector(new StanzaIdFilter(localEmailIQ.getStanzaId()));
-//        connection.sendStanza(localEmailIQ);
-//        Stanza localStanza = localStanzaCollector.nextResult(connection.getReplyTimeout());
-//        localStanzaCollector.cancel();
-//        if (localStanza == null)
-//            throw new XMPPErrorException("No response from server.");
-//        if (localStanza.getError() != null)
-//            throw new XMPPErrorException(localStanza.getError());
         return true;
     }
     
@@ -53,14 +45,6 @@ public class WorkgroupExt extends Workgroup {
         
         this.connection.createStanzaCollectorAndSend(localEmailIQ);
         
-//        StanzaCollector localStanzaCollector = this.connection.createStanzaCollector(new StanzaIdFilter(localEmailIQ.getStanzaId()));
-//        this.connection.sendStanza(localEmailIQ);
-//        Stanza localStanza = localStanzaCollector.nextResult(connection.getReplyTimeout());
-//        localStanzaCollector.cancel();
-//        if (localStanza == null)
-//            throw new XMPPErrorException("No response from server.");
-//        if (localStanza.getError() != null)
-//            throw new XMPPErrorException(localStanza.getError());
         return true;
     }
     

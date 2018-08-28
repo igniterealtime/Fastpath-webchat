@@ -36,7 +36,7 @@
             <param-value>fatal.jsp</param-value>
         </init-param>
     </filter>
-     <filter>
+    <filter>
         <filter-name>CharacterEncoder</filter-name>
         <filter-class>org.jivesoftware.webchat.SetCharacterEncodingFilter</filter-class>
     </filter>
@@ -44,7 +44,7 @@
         <filter-name>SetupFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-     <filter-mapping>
+    <filter-mapping>
         <filter-name>CharacterEncoder</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
@@ -56,8 +56,8 @@
         <servlet-class>org.jivesoftware.webchat.FastpathServlet</servlet-class>
         <!-- Uncomment to have console debugger enabled -->
         <init-param>
-           <param-name>smackDebugger</param-name>
-           <param-value>org.jivesoftware.smack.debugger.ConsoleDebugger</param-value>
+            <param-name>smackDebugger</param-name>
+            <param-value>org.jivesoftware.smack.debugger.ConsoleDebugger</param-value>
         </init-param>
         <!-- -->
         <load-on-startup>1</load-on-startup>

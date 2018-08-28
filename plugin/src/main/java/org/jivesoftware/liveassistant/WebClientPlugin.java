@@ -12,9 +12,12 @@
 
 package org.jivesoftware.liveassistant;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import org.jivesoftware.openfire.XMPPServer;
+import org.jivesoftware.openfire.container.AdminConsolePlugin;
+import org.jivesoftware.openfire.container.Plugin;
+import org.jivesoftware.openfire.container.PluginManager;
+import org.jivesoftware.util.JiveGlobals;
+import org.jivesoftware.util.Log;
 
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
@@ -23,12 +26,10 @@ import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.jivesoftware.openfire.XMPPServer;
-import org.jivesoftware.openfire.container.AdminConsolePlugin;
-import org.jivesoftware.openfire.container.Plugin;
-import org.jivesoftware.openfire.container.PluginManager;
-import org.jivesoftware.util.JiveGlobals;
-import org.jivesoftware.util.Log;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Plugin implementation to allow the web client to operate as a plugin in Jive Messenger.

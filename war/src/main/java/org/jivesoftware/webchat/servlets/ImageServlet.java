@@ -12,6 +12,11 @@
 
 package org.jivesoftware.webchat.servlets;
 
+import org.jivesoftware.webchat.util.SettingsManager;
+
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
+
 import java.io.IOException;
 
 import javax.servlet.ServletConfig;
@@ -19,10 +24,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.jivesoftware.webchat.util.SettingsManager;
-import org.jxmpp.jid.Jid;
-import org.jxmpp.jid.impl.JidCreate;
 
 /**
  * Retrieves the images belonging to particular workgroup. This is used for the look and feel of

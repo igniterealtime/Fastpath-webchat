@@ -10,9 +10,9 @@
  */
 package org.jivesoftware.webchat.personal;
 
-import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
+import org.jivesoftware.webchat.ChatManager;
+import org.jivesoftware.webchat.settings.ConnectionSettings;
+import org.jivesoftware.webchat.util.WebLog;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
@@ -24,10 +24,11 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.jiveproperties.JivePropertiesManager;
 import org.jivesoftware.smackx.xevent.MessageEventManager;
 import org.jivesoftware.smackx.xevent.MessageEventNotificationListener;
-import org.jivesoftware.webchat.ChatManager;
-import org.jivesoftware.webchat.settings.ConnectionSettings;
-import org.jivesoftware.webchat.util.WebLog;
 import org.jxmpp.jid.Jid;
+
+import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /* RCSFile: $
  * Revision: $

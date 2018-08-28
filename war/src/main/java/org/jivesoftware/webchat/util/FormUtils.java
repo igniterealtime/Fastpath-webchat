@@ -11,6 +11,9 @@
  */
 package org.jivesoftware.webchat.util;
 
+import org.jivesoftware.smackx.xdata.FormField;
+import org.jivesoftware.smackx.xdata.FormField.Option;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
@@ -18,9 +21,6 @@ import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
-import org.jivesoftware.smackx.xdata.FormField;
-import org.jivesoftware.smackx.xdata.FormField.Option;
 
 public class FormUtils {
 

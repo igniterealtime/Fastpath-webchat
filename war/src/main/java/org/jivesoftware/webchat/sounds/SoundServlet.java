@@ -1,5 +1,16 @@
 package org.jivesoftware.webchat.sounds;
 
+import org.jivesoftware.webchat.ChatManager;
+import org.jivesoftware.webchat.util.WebLog;
+
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.workgroup.settings.SoundSettings;
+import org.jivesoftware.smackx.workgroup.user.Workgroup;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
+
 import java.io.IOException;
 
 import javax.servlet.ServletConfig;
@@ -7,16 +18,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.jivesoftware.smack.SmackException.NoResponseException;
-import org.jivesoftware.smack.SmackException.NotConnectedException;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.workgroup.settings.SoundSettings;
-import org.jivesoftware.smackx.workgroup.user.Workgroup;
-import org.jivesoftware.webchat.ChatManager;
-import org.jivesoftware.webchat.util.WebLog;
-import org.jxmpp.jid.Jid;
-import org.jxmpp.jid.impl.JidCreate;
 
 public class SoundServlet extends HttpServlet {
 

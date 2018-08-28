@@ -12,12 +12,13 @@
 
 package org.jivesoftware.webchat.util;
 
-import java.util.Date;
-
-import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.webchat.filter.EmoticonFilter;
 import org.jivesoftware.webchat.filter.TextStyleFilter;
 import org.jivesoftware.webchat.filter.URLFilter;
+
+import org.jivesoftware.smack.packet.Presence;
+
+import java.util.Date;
 
 /**
  * The <code>WebUtils</code> class is a utility class for some of the most

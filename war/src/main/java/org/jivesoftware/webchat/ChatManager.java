@@ -12,6 +12,20 @@
 
 package org.jivesoftware.webchat;
 
+import org.jivesoftware.webchat.actions.WorkgroupStatus;
+import org.jivesoftware.webchat.settings.ChatSettingsManager;
+import org.jivesoftware.webchat.settings.ConnectionSettings;
+import org.jivesoftware.webchat.util.WebLog;
+
+import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jxmpp.jid.EntityBareJid;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,20 +36,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.servlet.ServletContext;
-
-import org.jivesoftware.smack.ConnectionListener;
-import org.jivesoftware.smack.SmackException.NotConnectedException;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.tcp.XMPPTCPConnection;
-import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
-import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.webchat.actions.WorkgroupStatus;
-import org.jivesoftware.webchat.settings.ChatSettingsManager;
-import org.jivesoftware.webchat.settings.ConnectionSettings;
-import org.jivesoftware.webchat.util.WebLog;
-import org.jxmpp.jid.EntityBareJid;
-
 
 /**
  * The ChatManager for the Web Chat Service. The ChatManager handles all ChatSessions,
@@ -86,9 +86,9 @@ public final class ChatManager {
      * Creates a new session manager.
      */
     private ChatManager() {
-      
-      new WorkgroupInitializer().initialize();
-      
+
+        new WorkgroupInitializer().initialize();
+
         sessions = Collections.synchronizedMap(new HashMap<>());
 
         // Setup timer to check for lingering sessions.
@@ -303,15 +303,15 @@ public final class ChatManager {
         // Initialize the XMPP connection
         try {
 
-          XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder()
-             .setSecurityMode(XMPPTCPConnectionConfiguration.SecurityMode.disabled)
-             .setXmppDomain(host)
-             .setHost(host)
-             .setPort(port);
-          
-          config.performSaslAnonymousAuthentication();
-          
-          xmppConn = new XMPPTCPConnection(config.build());
+            XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder()
+               .setSecurityMode(XMPPTCPConnectionConfiguration.SecurityMode.disabled)
+               .setXmppDomain(host)
+               .setHost(host)
+               .setPort(port);
+            
+            config.performSaslAnonymousAuthentication();
+            
+            xmppConn = new XMPPTCPConnection(config.build());
             xmppConn.connect();
 
             // Login the presence bot user

@@ -12,15 +12,11 @@
 
 package org.jivesoftware.webchat;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Logger;
+import org.jivesoftware.webchat.history.Line;
+import org.jivesoftware.webchat.history.Transcript;
+import org.jivesoftware.webchat.personal.ChatMessage;
+import org.jivesoftware.webchat.util.ModelUtil;
+import org.jivesoftware.webchat.util.WebLog;
 
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.MessageListener;
@@ -47,16 +43,20 @@ import org.jivesoftware.smackx.workgroup.WorkgroupInvitationListener;
 import org.jivesoftware.smackx.workgroup.user.Workgroup;
 import org.jivesoftware.smackx.xevent.MessageEventManager;
 import org.jivesoftware.smackx.xevent.MessageEventNotificationListener;
-import org.jivesoftware.webchat.history.Line;
-import org.jivesoftware.webchat.history.Transcript;
-import org.jivesoftware.webchat.personal.ChatMessage;
-import org.jivesoftware.webchat.util.ModelUtil;
-import org.jivesoftware.webchat.util.WebLog;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.EntityFullJid;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.stringprep.XmppStringprepException;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * The <code>ChatSession</code> class is responsible for handling all aspects of a chat. Connections, Joining
@@ -65,9 +65,7 @@ import org.jxmpp.stringprep.XmppStringprepException;
  * @author Derek DeMoro
  */
 public class ChatSession implements MessageEventNotificationListener, StanzaListener {
-  
-  private static Logger logger = Logger.getLogger(ChatSession.class.getName());
-  
+
     private XMPPTCPConnection connection;
     private Workgroup workgroup;
     private MultiUserChat groupChat;
@@ -402,9 +400,9 @@ public class ChatSession implements MessageEventNotificationListener, StanzaList
         // If we've already been routed and are in a chat, leave it.
         if (groupChat != null) {
             try {
-              groupChat.leave();
+                groupChat.leave();
             } catch (NotConnectedException | InterruptedException e) {
-              WebLog.logError("Error closing ChatSession:", e);
+                WebLog.logError("Error closing ChatSession:", e);
               
             }
             groupChat = null;
@@ -454,30 +452,30 @@ public class ChatSession implements MessageEventNotificationListener, StanzaList
                 groupChat.join(nickname);
             }
             groupChat.addParticipantListener(new PresenceListener() {
-              
-              @Override
-              public void processPresence(Presence presence) {
 
-                final Jid from = presence.getFrom();
-                Resourcepart user = from.getResourceOrEmpty();
-                
-                if (presence.getType() != Presence.Type.available) {
-                  lastAgent = user;
-                }
-
+                @Override
+                public void processPresence(Presence presence) {
+  
+                    final Jid from = presence.getFrom();
+                    Resourcepart user = from.getResourceOrEmpty();
+                    
+                    if (presence.getType() != Presence.Type.available) {
+                        lastAgent = user;
+                    }
+  
                     final Timer timer = new Timer();
                     timer.schedule(new TimerTask() {
                         public void run() {
                             try {
-                              checkForEmptyRoom();
+                                checkForEmptyRoom();
                             } catch (NotConnectedException | InterruptedException e) {
-                              logger.fine("checkForEmptyRoom:" + e.getMessage());
+                                WebLog.log("checkForEmptyRoom:" + e.getMessage());
                               
                             }
                         }
                     }, 5000);
-
-
+  
+  
                 }
             });
 

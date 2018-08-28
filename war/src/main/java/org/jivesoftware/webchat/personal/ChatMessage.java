@@ -10,13 +10,14 @@
  */
 package org.jivesoftware.webchat.personal;
 
+import org.jivesoftware.webchat.util.FormText;
+import org.jivesoftware.webchat.util.ModelUtil;
+import org.jivesoftware.webchat.util.WebUtils;
+
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smackx.jiveproperties.JivePropertiesManager;
-import org.jivesoftware.webchat.util.FormText;
-import org.jivesoftware.webchat.util.ModelUtil;
-import org.jivesoftware.webchat.util.WebUtils;
 import org.jxmpp.jid.parts.Localpart;
 
 /* RCSFile: $

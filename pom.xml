@@ -1,30 +1,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>parent</artifactId>
-    <groupId>org.igniterealtime.openfire</groupId>
-    <version>4.3.0-SNAPSHOT</version>
-  </parent>
-  <groupId>org.igniterealtime.openfire.fastpath</groupId>
-  <artifactId>webchat</artifactId>
-  <version>2.6.2</version>
-  <packaging>pom</packaging>
-  <name>Fastpath Webchat</name>
-  <description>Web based chat client for Fastpath</description>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>parent</artifactId>
+        <groupId>org.igniterealtime.openfire</groupId>
+        <version>4.3.0-SNAPSHOT</version>
+    </parent>
+    <groupId>org.igniterealtime.openfire.fastpath</groupId>
+    <artifactId>webchat</artifactId>
+    <version>2.6.2</version>
+    <packaging>pom</packaging>
+    <name>Fastpath Webchat</name>
+    <description>Web based chat client for Fastpath</description>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Versions -->
         <!-- Note; the following jetty.version should be identical to the jetty.version in plugins/pom.xml -->
-    <jetty.version>9.4.11.v20180605</jetty.version>
-    <smack.version>4.2.3</smack.version>
-    <plugin.name>webchat</plugin.name>
-  </properties>
+        <jetty.version>9.4.11.v20180605</jetty.version>
+        <smack.version>4.2.4</smack.version>
+        <plugin.name>webchat</plugin.name>
+    </properties>
 
-  <developers>
-     <developer>
+    <developers>
+        <developer>
             <name>Guus der Kinderen</name>
             <roles>
                 <role>Lead Developer</role>
@@ -34,15 +34,46 @@
             <organization>Ignite Realtime</organization>
             <organizationUrl>http://www.igniterealtime.org</organizationUrl>
         </developer>
-    <developer>
-      <name>Anno van Vliet</name>
-    </developer>
- </developers>
+        <developer>
+            <name>Anno van Vliet</name>
+        </developer>
+    </developers>
 
-  <modules>
-    <module>war</module>
-    <module>plugin</module>
-  </modules>
+    <modules>
+        <module>war</module>
+        <module>plugin</module>
+    </modules>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.ec4j.maven</groupId>
+                <artifactId>editorconfig-maven-plugin</artifactId>
+                <version>0.0.5</version>
+                <executions>
+                    <execution>
+                        <id>check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludes>
+        <!-- Note that maven submodule directories and many non-source file patterns are excluded by default -->
+        <!-- - see https://github.com/ec4j/editorconfig-maven-plugin/blob/master/ec4j-lint-api/src/main/java/org/ec4j/maven/lint/api/Constants.java#L37 -->
+        <!-- You can exclude further files from processing: -->
+                        <exclude>src/main/**/*.whatever</exclude>
+                    </excludes>
+      <!-- All files are included by default:
+      <includes>
+        <include>**</include>
+      </includes>
+      -->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

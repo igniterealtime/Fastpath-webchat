@@ -12,13 +12,10 @@
 
 package org.jivesoftware.webchat.servlets;
 
-import java.io.IOException;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.jivesoftware.webchat.ChatManager;
+import org.jivesoftware.webchat.actions.WorkgroupStatus;
+import org.jivesoftware.webchat.util.SettingsManager;
+import org.jivesoftware.webchat.util.WebLog;
 
 import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
@@ -26,13 +23,17 @@ import org.jivesoftware.smack.SmackException.NotLoggedInException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
-import org.jivesoftware.webchat.ChatManager;
-import org.jivesoftware.webchat.actions.WorkgroupStatus;
-import org.jivesoftware.webchat.util.SettingsManager;
-import org.jivesoftware.webchat.util.WebLog;
 import org.jxmpp.jid.BareJid;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
+
+import java.io.IOException;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Used to retrieve images from within an email account. This allows to bypass

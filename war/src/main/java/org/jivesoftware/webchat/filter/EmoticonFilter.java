@@ -10,11 +10,11 @@
 
 package org.jivesoftware.webchat.filter;
 
+import org.jivesoftware.webchat.util.ModelUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-
-import org.jivesoftware.webchat.util.ModelUtil;
 
 /**
  * A Filter that converts ASCII emoticons into image equivalents.

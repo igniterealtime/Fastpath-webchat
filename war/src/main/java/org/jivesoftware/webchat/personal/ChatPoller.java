@@ -10,9 +10,7 @@
  */
 package org.jivesoftware.webchat.personal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import org.jivesoftware.webchat.util.ModelUtil;
 
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.chat.Chat;
@@ -20,8 +18,11 @@ import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
-import org.jivesoftware.webchat.util.ModelUtil;
 import org.jxmpp.jid.parts.Localpart;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /* RCSFile: $
  * Revision: $

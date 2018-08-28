@@ -12,18 +12,6 @@
 
 package org.jivesoftware.webchat.actions;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.Cookie;
-
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.workgroup.settings.WorkgroupProperties;
@@ -36,10 +24,23 @@ import org.jivesoftware.webchat.settings.ConnectionSettings;
 import org.jivesoftware.webchat.util.ModelUtil;
 import org.jivesoftware.webchat.util.StringUtils;
 import org.jivesoftware.webchat.util.WebLog;
+
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.stringprep.XmppStringprepException;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.Cookie;
 
 /**
  * Puts users into the ChatQueue to await assistance. The ChatStarter is used

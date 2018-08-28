@@ -10,6 +10,24 @@
 
 package org.jivesoftware.webchat;
 
+import org.jivesoftware.webchat.actions.WorkgroupStatus;
+import org.jivesoftware.webchat.settings.ChatSettingsManager;
+import org.jivesoftware.webchat.util.ModelUtil;
+import org.jivesoftware.webchat.util.SettingsManager;
+import org.jivesoftware.webchat.util.URLFileSystem;
+import org.jivesoftware.webchat.util.WebLog;
+
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.SmackException.NotLoggedInException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.roster.Roster;
+import org.jxmpp.jid.BareJid;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,23 +44,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.jivesoftware.smack.SmackException.NoResponseException;
-import org.jivesoftware.smack.SmackException.NotConnectedException;
-import org.jivesoftware.smack.SmackException.NotLoggedInException;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.Stanza;
-import org.jivesoftware.smack.roster.Roster;
-import org.jivesoftware.webchat.actions.WorkgroupStatus;
-import org.jivesoftware.webchat.settings.ChatSettingsManager;
-import org.jivesoftware.webchat.util.ModelUtil;
-import org.jivesoftware.webchat.util.SettingsManager;
-import org.jivesoftware.webchat.util.URLFileSystem;
-import org.jivesoftware.webchat.util.WebLog;
-import org.jxmpp.jid.BareJid;
-import org.jxmpp.jid.Jid;
-import org.jxmpp.jid.impl.JidCreate;
 
 /**
  * Live Assistant servlet.

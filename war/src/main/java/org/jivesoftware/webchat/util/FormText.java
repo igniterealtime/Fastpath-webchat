@@ -11,13 +11,13 @@
 
 package org.jivesoftware.webchat.util;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.jivesoftware.smackx.workgroup.settings.ChatSetting;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class FormText {
 

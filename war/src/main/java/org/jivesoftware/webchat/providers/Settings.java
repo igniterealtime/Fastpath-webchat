@@ -12,14 +12,15 @@
 
 package org.jivesoftware.webchat.providers;
 
-import java.util.Map;
+import org.jivesoftware.webchat.util.WebLog;
 
 import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.iqprivate.PrivateDataManager;
-import org.jivesoftware.webchat.util.WebLog;
+
+import java.util.Map;
 
 /**
  * Handles all generic metadata settings for a particular workgroup. For example, to retrieve emails settings for
