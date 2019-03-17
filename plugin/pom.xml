@@ -1,0 +1,85 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>webchat</artifactId>
+        <groupId>org.igniterealtime.openfire.fastpath</groupId>
+        <version>2.6.2</version>
+    </parent>
+    <artifactId>webchat-plugin</artifactId>
+    <name>Fastpath Webchat plugin</name>
+    <description>Web based chat client for Fastpath Openfire-Plugin</description>
+
+    <properties>
+        <openfireStructure.build.dir>${project.build.directory}/${project.artifactId}-${project.version}</openfireStructure.build.dir>
+        <openfireStructure.lib.dir>${openfireStructure.build.dir}/lib</openfireStructure.lib.dir>
+        <openfire.version>4.0.1</openfire.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/assembly/openfire-plugin-assembly.xml</descriptor>
+                            </descriptors>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${plugin.name}</finalName>
+                            <attach>false</attach>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>webchat-war</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+    
+        <dependency>
+            <groupId>org.igniterealtime.openfire</groupId>
+            <artifactId>openfire</artifactId>
+            <version>${openfire.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+            <version>${jetty.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jetty.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-plus</artifactId>
+            <version>${jetty.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>apache-jsp</artifactId>
+            <version>${jetty.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -154,7 +154,7 @@
             uriroot="${src.webapp.dir}"
             outputDir="${jspc.java.dest.dir}"
             package="org.jivesoftware.webclient.jsp"
-            webXml="${jspc.dest.dir}/WEB-INF/web.xml.generated" />
+            webXmlFragment="${jspc.dest.dir}/WEB-INF/web.xml.generated" />
 
         <!-- Compile java source -->
         <javac
@@ -163,7 +163,7 @@
             debug="on"
             source="1.5"
             target="1.5"
-            includes="org/jivesoftware/webclient/jsp/**/*.java"
+            includes="**/*.java"
         >
             <src path="${jspc.java.dest.dir}" />
             <classpath>
