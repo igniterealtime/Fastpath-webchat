@@ -4,7 +4,7 @@
     <parent>
         <artifactId>webchat</artifactId>
         <groupId>org.igniterealtime.openfire.fastpath</groupId>
-        <version>2.6.2</version>
+        <version>4.2.0-SNAPSHOT</version>
     </parent>
     <artifactId>webchat-plugin</artifactId>
     <name>Fastpath Webchat plugin</name>
@@ -13,7 +13,7 @@
     <properties>
         <openfireStructure.build.dir>${project.build.directory}/${project.artifactId}-${project.version}</openfireStructure.build.dir>
         <openfireStructure.lib.dir>${openfireStructure.build.dir}/lib</openfireStructure.lib.dir>
-        <openfire.version>4.0.1</openfire.version>
+        <openfire.version>4.3.0</openfire.version>
     </properties>
 
     <build>
@@ -51,7 +51,7 @@
     
         <dependency>
             <groupId>org.igniterealtime.openfire</groupId>
-            <artifactId>openfire</artifactId>
+            <artifactId>xmppserver</artifactId>
             <version>${openfire.version}</version>
             <scope>provided</scope>
         </dependency>

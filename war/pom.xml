@@ -4,7 +4,7 @@
     <parent>
         <artifactId>webchat</artifactId>
         <groupId>org.igniterealtime.openfire.fastpath</groupId>
-        <version>2.6.2</version>
+        <version>4.2.0-SNAPSHOT</version>
     </parent>
     <artifactId>webchat-war</artifactId>
     <packaging>war</packaging>
