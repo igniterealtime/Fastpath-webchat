@@ -13,7 +13,7 @@
     <properties>
         <openfireStructure.build.dir>${project.build.directory}/${project.artifactId}-${project.version}</openfireStructure.build.dir>
         <openfireStructure.lib.dir>${openfireStructure.build.dir}/lib</openfireStructure.lib.dir>
-        <openfire.version>4.3.0</openfire.version>
+        <openfire.version>4.4.1</openfire.version>
     </properties>
 
     <build>
